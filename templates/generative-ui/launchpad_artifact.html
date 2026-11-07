@@ -1,556 +1,918 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>VibeCraft Launchpad</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<title>VibeCraft · Launchpad</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js" integrity="sha384-rbtjAdnIQE/aQJGEgXrVUlMibdfTSa4PQju4HDhN3sR2PmaKFzhEafuePsl9H/9I" crossorigin="anonymous"></script>
 <style>
 :root {
-  --bg-primary: #09090b;
-  --bg-surface: #18181b;
-  --bg-raised: #27272a;
-  --fg-primary: #ededef;
-  --fg-muted: #9a9aa5;
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #5e6ad2;
-  --accent-fg: #fafafa;
-  --success: #4ade80;
-  --danger: #f87171;
+  --bg-primary: #0b0c0e;
+  --bg-surface: #121417;
+  --bg-raised: #191c21;
+  --fg-primary: #f4f5f8;
+  --fg-muted: #8c93a3;
+  --border: rgba(244, 245, 248, 0.10);
+  --border-strong: rgba(244, 245, 248, 0.22);
+  --accent: #7c89ff;
+  --accent-fg: #0b0c0e;
+  --accent-soft: rgba(124, 137, 255, 0.12);
+  --success: #3dd68c;
+  --success-soft: rgba(61, 214, 140, 0.12);
+  --warn: #f5a623;
+  --warn-soft: rgba(245, 166, 35, 0.12);
+  --danger: #ff7373;
+  --danger-soft: rgba(255, 115, 115, 0.12);
   --radius: 8px;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --radius-sm: 6px;
+  --shadow-overlay: 0 10px 28px rgba(0, 0, 0, 0.42);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: light) {
   :root {
-    --bg-primary: #fbfbfa;
-    --bg-surface: #f4f4f1;
-    --bg-raised: #e9e9e5;
-    --fg-primary: #18181b;
-    --fg-muted: #52525b;
-    --border: rgba(24, 24, 27, 0.12);
-    --accent: #4f58b8;
-    --accent-fg: #fafafa;
-    --success: #15803d;
-    --danger: #b91c1c;
+    --bg-primary: #f6f6f4;
+    --bg-surface: #fcfcfa;
+    --bg-raised: #ebebea;
+    --fg-primary: #161618;
+    --fg-muted: #525259;
+    --border: rgba(22, 22, 24, 0.12);
+    --border-strong: rgba(22, 22, 24, 0.26);
+    --accent: #3b46b8;
+    --accent-fg: #fcfcfa;
+    --accent-soft: rgba(59, 70, 184, 0.09);
+    --success: #136c2e;
+    --success-soft: rgba(19, 108, 46, 0.10);
+    --warn: #854800;
+    --warn-soft: rgba(133, 72, 0, 0.10);
+    --danger: #b01c12;
+    --danger-soft: rgba(176, 28, 18, 0.10);
+    --shadow-overlay: 0 8px 24px rgba(22, 22, 24, 0.08);
   }
 }
-
 *, *::before, *::after { box-sizing: border-box; }
-.grid > * { min-width: 0; }
-html { color-scheme: light dark; }
-body { margin: 0; background-color: var(--bg-primary); color: var(--fg-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.55; }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-h1, h2, h3, p, ul { margin: 0; }
-body h1 { font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
-body h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
-body h3 { font-size: 16px; font-weight: 600; line-height: 1.3; }
-.mono { font-family: var(--font-mono); }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-primary);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.shell {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-block: 24px 40px;
+  padding-inline: 16px;
+}
+@media (min-width: 768px) {
+  .shell { padding-inline: 28px; }
+}
+.eyebrow {
+  margin: 0 0 4px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+p { margin: 0; overflow-wrap: anywhere; }
 .muted { color: var(--fg-muted); }
-
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tabular { font-variant-numeric: tabular-nums; }
+.header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-end: 20px;
+  padding-block-end: 16px;
+  border-block-end: 1px solid var(--border);
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  height: 36px; padding: 0 14px; border-radius: var(--radius);
-  border: 1px solid var(--border); background-color: transparent; color: var(--fg-primary);
-  font: inherit; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap;
-  transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out, opacity 150ms ease-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  min-width: 38px;
+  padding-block: 8px;
+  padding-inline: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 550;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, opacity 140ms ease;
 }
-.btn:hover:not(:disabled) { background-color: var(--bg-raised); }
-.btn:active:not(:disabled) { transform: translateY(1px); }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background-color: var(--accent); border-color: var(--accent); color: var(--accent-fg); height: 40px; padding: 0 18px; font-size: 14px; }
-.btn-primary:hover:not(:disabled) { background-color: color-mix(in srgb, var(--accent) 86%, var(--fg-primary)); }
-.btn[data-state="done"] { color: var(--success); border-color: var(--success); }
-.btn[data-state="manual"] { color: var(--danger); border-color: var(--danger); }
-
-.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); overflow-x: auto; }
-.tab {
-  position: relative; height: 44px; padding: 0 16px; border: 0; background-color: transparent; color: var(--fg-muted);
-  font: inherit; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap;
-  transition: color 150ms ease-out;
+.btn:hover:not(:disabled) {
+  background: var(--bg-raised);
+  border-color: var(--border-strong);
 }
-.tab::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; background-color: var(--accent); transform: scaleX(0); transition: transform 150ms ease-out; }
-.tab:hover { color: var(--fg-primary); }
-.tab[aria-selected="true"] { color: var(--fg-primary); }
-.tab[aria-selected="true"]::after { transform: scaleX(1); }
-.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: var(--radius); }
-
-.block { background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-.block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-.block-meta { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.lang { font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--fg-muted); }
-.code { margin: 0; padding: 14px; font-family: var(--font-mono); font-size: 13px; line-height: 1.65; overflow-x: auto; white-space: pre; tab-size: 2; }
-.code-wrap { white-space: pre-wrap; overflow-wrap: anywhere; }
-
-.diagram-host { padding: 20px; overflow-x: auto; display: grid; place-items: center; min-height: 200px; }
-.diagram-host svg { max-width: 100%; height: auto; }
-.seg { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid var(--border); border-radius: var(--radius); background-color: var(--bg-surface); }
-.seg label { position: relative; }
-.seg input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
-.seg span { display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--fg-muted); transition: background-color 150ms ease-out, color 150ms ease-out; }
-.seg input:checked + span { background-color: var(--accent); color: var(--accent-fg); }
-.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-.logo-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px; padding: 24px; }
-.logo-cell { display: grid; gap: 8px; justify-items: start; }
-.logo-box { aspect-ratio: 1; }
-.logo-box svg { width: 100%; height: 100%; display: block; }
-.bg-check { background-color: var(--bg-primary); }
-
-.status { font-size: 13px; color: var(--fg-muted); min-height: 20px; }
-.tool-tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; border: 1px solid var(--border); color: var(--fg-muted); }
-
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: transparent;
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--fg-primary);
+  opacity: 0.92;
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--fg-primary);
+  outline-offset: 2px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tag-verified { background: var(--success-soft); color: var(--success); }
+.tag-inferred { background: var(--accent-soft); color: var(--accent); }
+.tag-gotcha, .tag-warn { background: var(--warn-soft); color: var(--warn); }
+.tag-danger { background: var(--danger-soft); color: var(--danger); }
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-width: 0;
+}
+.empty-state {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  color: var(--fg-muted);
+}
+.fallback-wrap {
+  margin-block-start: 12px;
+}
+.fallback-box {
+  width: 100%;
+  min-height: 110px;
+  margin-block-start: 6px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.fallback-box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.footer-bar {
+  margin-block-start: 24px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.84rem;
+  color: var(--fg-muted);
+}
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+@media print {
+  body { background: var(--bg-surface); }
+  .no-print { display: none !important; }
+  .shell { max-width: 100%; padding: 0; }
+  .panel { break-inside: avoid; }
+}
+.hero-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-end: 20px;
+  padding-block-end: 16px;
+  border-block-end: 1px solid var(--border);
+}
+.hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.logo-frame {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+}
+.logo-frame svg {
+  width: 100%;
+  height: 100%;
+}
+.tab-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-end: 16px;
+}
+.tab-btn {
+  min-height: 38px;
+  padding-block: 8px;
+  padding-inline: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  font-weight: 550;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.tab-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-raised);
+}
+.tab-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.tab-btn[aria-selected="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.code-block {
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--fg-primary);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre;
+}
+.code-block:focus-visible, .diagram-box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.diagram-box {
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  overflow-x: auto;
+}
+.sec-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-block-end: 10px;
+}
+.stack-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.steps-list {
+  margin: 0;
+  padding-inline-start: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+@media print {
+  .tab-panel[hidden] { display: block !important; margin-block-start: 16px; }
 }
 </style>
 </head>
 <body>
-<div class="min-h-screen px-4 py-6 md:px-8 md:py-10">
-  <header class="flex flex-wrap items-end justify-between gap-4 pb-6">
-    <div class="grid gap-2">
-      <h2 id="phase">Phase 4 of 4 · Launchpad</h2>
-      <h1 id="title"></h1>
-      <p class="muted" id="tagline"></p>
+<div class="shell">
+  <header class="hero-row">
+    <div class="hero-brand">
+      <div id="logo-box" class="logo-frame" aria-hidden="true"></div>
+      <div style="min-width: 0;">
+        <p class="eyebrow" id="phase-label">Phase 4 of 4 · Launchpad</p>
+        <h1 id="title-heading">Project Launchpad</h1>
+        <p class="muted" id="tagline-text"></p>
+      </div>
     </div>
-    <div class="flex flex-wrap items-center gap-3">
-      <p class="status" id="status" role="status" aria-live="polite"></p>
-      <button type="button" class="btn btn-primary" id="copy-all">Copy All</button>
+    <div class="toolbar no-print">
+      <button type="button" class="btn btn-primary" id="copy-all-btn">Copy full bundle</button>
+      <button type="button" class="btn" id="download-md-btn">Download launchpad-bundle.md</button>
     </div>
   </header>
 
-  <div class="tabs" role="tablist" aria-label="Project deliverables" id="tablist"></div>
-  <main class="pt-6" id="panels"></main>
+  <main id="main-content">
+    <div id="tablist" class="tab-list no-print" role="tablist" aria-label="Launchpad sections"></div>
+    <div id="panels-root"></div>
+
+    <div id="fallback-wrap" class="fallback-wrap no-print" hidden>
+      <label for="fallback" class="muted mono">Manual copy fallback (Ctrl/Cmd+C):</label>
+      <textarea id="fallback" class="fallback-box" readonly></textarea>
+    </div>
+  </main>
+
+  <footer class="footer-bar">
+    <span id="live-status" role="status" aria-live="polite">Launchpad ready.</span>
+    <span class="mono" id="mermaid-mode">Sanitized SVG · Offline-ready</span>
+  </footer>
 </div>
 
 <script>
-// Builder agent: replace LAUNCH with this project's deliverables. Keep the keys; the tabs are built from them.
+// @vibecraft-data:start
+// Architect (Phase 3 draft) or Builder (Phase 4 final): replace LAUNCH object only.
 const LAUNCH = {
-  name: 'Murmur',
-  tagline: 'Voice memos that transcribe themselves and file under the right project.',
-  readme: [
-    '# Murmur',
-    '',
-    'Record a voice memo, get a transcript, and find it under the project it belongs to.',
-    'Everything runs on your device: audio and text stay in a local Postgres (PGlite).',
-    '',
-    '## Run it',
-    '',
-    'npm install',
-    'npm run dev',
-    '',
-    '## How it is built',
-    '',
-    '- Vite + React 19 + TypeScript (strict)',
-    '- PGlite for storage, persisted to IndexedDB',
-    '- Whisper (WASM) in a web worker for transcription',
-    '- Tailwind with design tokens in src/styles/tokens.css',
-    '',
-    '## Good to know',
-    '',
-    '- Safari may evict site storage after 7 days without a visit. Murmur asks for persistent storage on the first memo and offers a one-tap export.',
-    '- Close the AudioContext when the tab is hidden, or the mic indicator stays on.'
-  ].join('\n'),
-  commands: [
-    'npm create vite@latest murmur -- --template react-ts',
-    'cd murmur',
-    'npm install @electric-sql/pglite tailwindcss @tailwindcss/vite',
-    'npm install -D vitest @testing-library/react',
-    'npm run dev'
-  ].join('\n'),
+  phase: 'Phase 4 of 4 · Launchpad',
+  title: 'HookDrain is ready to launch',
+  name: 'HookDrain',
+  tagline: 'Idempotent edge webhook capture with streaming R2 NDJSON archives and local CLI replay.',
+  contractsLang: 'ts',
+  readme: 'HookDrain validates incoming webhook signatures at the Cloudflare edge, deduplicates deliveries in D1 SQLite, and streams daily NDJSON archives to R2 without buffering payloads in isolate RAM.',
+  commands: 'npm install\nnpm test\nnpx wrangler d1 migrations apply hookdrain-db --local\nnpx wrangler dev',
   tree: [
-    'murmur/',
-    '  src/',
-    '    components/   Recorder.tsx  MemoList.tsx  ProjectSidebar.tsx',
-    '    hooks/        useRecorder.ts  useTranscription.ts',
-    '    lib/          db.ts  projects.ts  types.ts',
-    '    workers/      transcribe.worker.ts',
-    '    styles/       tokens.css',
-    '  index.html'
+    'hookdrain/',
+    '├── src/contracts/events.ts      # Strict WebhookEnvelope and Result<T, DrainError> types',
+    '├── src/worker/index.ts          # Hono v4 routes + 2 MB bodyLimit + HMAC verification',
+    '├── src/worker/rollup-stream.ts  # TransformStream NDJSON archive writer to R2',
+    '├── src/cli/drain.ts             # Node 22 parseArgs CLI (stderr logs, stdout NDJSON)',
+    '└── src/styles/tokens.css        # Locked 19-key :root design tokens'
   ].join('\n'),
   flow: [
-    'flowchart TD',
-    '  A([Open app]) --> B{Mic permission?}',
-    '  B -- granted --> C[Record memo]',
-    '  B -- denied --> D[Show permission help]',
-    '  C --> E[Save audio to local storage]',
-    '  E --> F[Transcribe in worker]',
-    '  F --> G{Project detected?}',
-    '  G -- yes --> H[Group under project]',
-    '  G -- no --> I[Ask: pick or create project]',
-    '  H --> J[Memo list]',
-    '  I --> J'
+    'flowchart LR',
+    '  Sender["Webhook Producer"] -->|"POST <= 2 MB + HMAC"| Worker["Hono Edge Worker"]',
+    '  Worker -->|"INSERT OR IGNORE"| D1[("Cloudflare D1")]',
+    '  D1 -->|"500-row cursor"| Stream["TransformStream"]',
+    '  Stream -->|"Multipart NDJSON"| R2[("Cloudflare R2")]'
   ].join('\n'),
   sequence: [
     'sequenceDiagram',
-    '  participant U as User',
-    '  participant UI as Recorder UI',
-    '  participant W as Transcribe Worker',
-    '  participant DB as PGlite',
-    '  U->>UI: Hold to record',
-    '  UI->>DB: insert memo (status: recording)',
-    '  UI-->>U: waveform and timer',
-    '  U->>UI: Release',
-    '  UI->>W: audio blob',
-    '  W-->>UI: text segments (streamed)',
-    '  UI->>DB: update memo (status: ready)',
-    '  DB-->>UI: memos grouped by project'
+    '  participant P as Producer',
+    '  participant W as Hono Worker',
+    '  participant D as D1 SQLite',
+    '  P->>W: POST /ingest (Idempotency-Key, X-Signature)',
+    '  W->>W: Verify 2 MB cap + constant-time HMAC',
+    '  W->>D: INSERT OR IGNORE event',
+    '  D-->>W: changes (1 new | 0 duplicate)',
+    '  W-->>P: 202 Accepted'
   ].join('\n'),
   contracts: [
-    'export type MemoStatus = "recording" | "transcribing" | "ready" | "failed";',
+    'export type DrainError =',
+    '  | { readonly code: "PAYLOAD_TOO_LARGE"; readonly limitBytes: number }',
+    '  | { readonly code: "INVALID_SIGNATURE" };',
     '',
-    'export interface Project {',
-    '  id: string;',
-    '  name: string;',
-    '  createdAt: string;',
-    '}',
-    '',
-    'export interface Memo {',
-    '  id: string;',
-    '  projectId: string | null;',
-    '  audioKey: string;',
-    '  durationMs: number;',
-    '  transcript: string | null;',
-    '  status: MemoStatus;',
-    '  createdAt: string;',
-    '}',
-    '',
-    'export type AsyncState<T> =',
-    '  | { kind: "idle" }',
-    '  | { kind: "loading" }',
-    '  | { kind: "success"; data: T }',
-    '  | { kind: "error"; error: Error };',
-    '',
-    'export function isReady(memo: Memo): memo is Memo & { transcript: string } {',
-    '  return memo.status === "ready" && memo.transcript !== null;',
+    'export interface WebhookEnvelope {',
+    '  readonly idempotencyKey: string;',
+    '  readonly source: string;',
+    '  readonly receivedAtIso: string;',
+    '  readonly payloadJson: string;',
     '}'
   ].join('\n'),
-  logo: [
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Murmur logo">',
-    '  <rect width="64" height="64" rx="14" style="fill:var(--accent)"/>',
-    '  <g fill="none" style="stroke:var(--accent-fg);stroke-width:6;stroke-linecap:round">',
-    '    <path d="M16 26v12"/>',
-    '    <path d="M27 18v28"/>',
-    '    <path d="M38 23v18"/>',
-    '  </g>',
-    '  <circle cx="50" cy="32" r="3.5" style="fill:var(--accent-fg)"/>',
-    '</svg>'
-  ].join('\n'),
-  midjourney: 'abstract app icon, three rounded vertical bars rising and falling in height followed by one round dot, acoustic resonance geometry, flat vector, solid indigo field, off-white mark, generous padding, centered, symmetrical balance, no microphone, no headphones --style raw --v 6 --ar 1:1 --no microphone, headphones, gradient, glow, text, 3d, shadow',
-  dalle: 'A flat vector app icon on a solid indigo rounded square. The mark is made of three thick off-white vertical bars with rounded ends, tall in the middle and shorter on the sides, followed by a single off-white dot to the right, like a voice fading out. Generous padding, centered, no gradients, no glow, no shadow, no text, and no microphone or headphone imagery. It must stay readable at 16 pixels.',
+  logo: '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="52" height="52" rx="12" fill="var(--bg-raised)" stroke="var(--border-strong)" stroke-width="2"/><polygon points="18,20 46,20 35,34 35,46 29,42 29,34" fill="var(--accent)"/><circle cx="44" cy="44" r="4" fill="var(--fg-primary)"/></svg>',
+  midjourney: 'Minimalist geometric developer tool emblem, flat vector shapes on deep mineral slate background, crisp phosphor emerald accent, zero gradients --v 6.1',
+  dalle: 'Flat geometric app icon for a webhook pipeline tool named HookDrain, clean vector funnel and node mark on dark slate card, no text, no gradients.',
   nextSteps: [
-    {
-      tool: 'Cursor',
-      title: 'Memo detail screen',
-      prompt: 'In the Murmur repo (Vite + React 19 + TypeScript strict + PGlite), add a MemoDetail route at /memo/:id. Show the audio player, the transcript with the segment under the playhead highlighted, and a project picker. Use only classes backed by tokens in src/styles/tokens.css (no hardcoded colors), design hover, focus-visible, disabled, loading and error states, and use the Memo and AsyncState types from src/lib/types.ts. Add a Vitest test for the loading and error states.'
-    },
-    {
-      tool: 'v0',
-      title: 'Project sidebar and empty state',
-      prompt: 'Design a left sidebar for a voice memo app listing projects with memo counts (tabular numbers), a "New project" row, and a collapsed state at 64px wide. Include the empty state for a project with no memos: a short line explaining that recordings appear here after transcription, and a primary "Record a memo" button. Dark zinc surfaces, hairline borders, one indigo accent, no gradients, no glows.'
-    },
-    {
-      tool: 'Claude',
-      title: 'Storage durability pass',
-      prompt: 'Review src/lib/db.ts for data-loss risks. Request navigator.storage.persist() after the first saved memo, surface the result in Settings, add a one-tap export of all memos and audio as a zip, and handle QuotaExceededError by telling the user what to export or delete. Do not add retries or fallbacks without a named failure. List what you changed and what you could not verify.'
-    }
+    'Configure production HMAC signing secret via wrangler secret put WEBHOOK_SECRET.',
+    'Schedule a 15-minute Cron Trigger to flush unarchived D1 batches to R2.',
+    'Add dead-letter replay filtering by event source in drain CLI.'
   ]
 };
+// @vibecraft-data:end
 
 const $ = (id) => document.getElementById(id);
-let statusTimer = 0;
-let diagramKind = 'flow';
+let flashTimer = 0;
 
-function node(tag, className, text) {
-  const n = document.createElement(tag);
-  if (className) n.className = className;
-  if (text !== undefined) n.textContent = text;
-  return n;
-}
-
-function legacyCopy(text) {
-  const area = document.createElement('textarea');
-  area.value = text;
-  area.setAttribute('readonly', '');
-  area.style.position = 'fixed';
-  area.style.opacity = '0';
-  document.body.appendChild(area);
-  area.select();
-  let ok = false;
-  try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
-  area.remove();
-  return ok;
-}
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (error) {
-    return legacyCopy(text);
+function announceStatus(msg, btn, doneLabel) {
+  const statusEl = $('live-status');
+  if (statusEl) statusEl.textContent = msg;
+  if (btn && doneLabel) {
+    if (!btn.dataset.origLabel) btn.dataset.origLabel = btn.textContent;
+    btn.textContent = doneLabel;
+    window.clearTimeout(flashTimer);
+    flashTimer = window.setTimeout(() => {
+      btn.textContent = btn.dataset.origLabel;
+    }, 1600);
   }
 }
 
-function flashButton(btn, ok, idleLabel) {
-  btn.dataset.state = ok ? 'done' : 'manual';
-  btn.textContent = ok ? 'Copied' : 'Press Ctrl/Cmd+C';
-  window.setTimeout(() => {
-    delete btn.dataset.state;
-    btn.textContent = idleLabel;
-  }, 1800);
+async function copyWithFallback(text, btn, doneLabel) {
+  const fbWrap = $('fallback-wrap');
+  const fb = $('fallback');
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      if (fbWrap) fbWrap.hidden = true;
+      announceStatus('Copied to clipboard.', btn, doneLabel || 'Copied ✓');
+      return;
+    }
+    throw new Error('Clipboard API unavailable');
+  } catch (_err) {
+    if (fb && fbWrap) {
+      fbWrap.hidden = false;
+      fb.value = text;
+      fb.focus();
+      fb.select();
+    }
+    announceStatus('Clipboard blocked by sandbox; select and copy from the text box below.', btn, 'Select below');
+  }
 }
 
-function selectContents(el) {
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  const selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
+function downloadBlob(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType || 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  announceStatus('Downloaded ' + filename + '.');
 }
 
-function codeBlock(title, lang, text, wrap) {
-  if (!text) return null;
-  const block = node('section', 'block');
-  const head = node('div', 'block-head');
-  const meta = node('div', 'block-meta');
-  meta.append(node('h3', '', title), node('span', 'lang', lang));
-  const btn = node('button', 'btn', 'Copy');
-  btn.type = 'button';
-  btn.setAttribute('aria-label', 'Copy ' + title);
-  const pre = node('pre', 'code' + (wrap ? ' code-wrap' : ''));
-  pre.textContent = text;
-  btn.addEventListener('click', async () => {
-    const ok = await copyText(text);
-    if (!ok) selectContents(pre);
-    flashButton(btn, ok, 'Copy');
-  });
-  head.append(meta, btn);
-  block.append(head, pre);
-  return block;
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const SAFE_SVG_TAGS = new Set(['svg', 'g', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'path']);
+const SAFE_SVG_ATTRS = new Set([
+  'viewBox', 'width', 'height', 'x', 'y', 'x1', 'y1', 'x2', 'y2',
+  'cx', 'cy', 'r', 'rx', 'ry', 'd', 'points',
+  'fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width',
+  'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'stroke-opacity',
+  'opacity', 'transform', 'role', 'aria-label', 'aria-hidden', 'focusable'
+]);
+
+function fallbackLogoSvg() {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 64 64');
+  const rect = document.createElementNS(SVG_NS, 'rect');
+  rect.setAttribute('x', '8');
+  rect.setAttribute('y', '8');
+  rect.setAttribute('width', '48');
+  rect.setAttribute('height', '48');
+  rect.setAttribute('rx', '10');
+  rect.setAttribute('fill', 'var(--bg-raised)');
+  rect.setAttribute('stroke', 'var(--accent)');
+  rect.setAttribute('stroke-width', '2');
+  const path = document.createElementNS(SVG_NS, 'path');
+  path.setAttribute('d', 'M20 22 L31 44 L44 22');
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', 'var(--fg-primary)');
+  path.setAttribute('stroke-width', '5');
+  path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('stroke-linejoin', 'round');
+  svg.appendChild(rect);
+  svg.appendChild(path);
+  return svg;
 }
 
-const DIAGRAM_KINDS = [['flow', 'User journey'], ['sequence', 'Lifecycle']];
-
-function gather(className, children) {
-  const kids = children.filter(Boolean);
-  if (kids.length === 0) return null;
-  const wrap = node('div', className);
-  wrap.append(...kids);
-  return wrap;
-}
-
-function buildDocs() {
-  const side = gather('grid gap-6 content-start', [codeBlock('Setup commands', 'bash', LAUNCH.commands), codeBlock('File tree', 'text', LAUNCH.tree)]);
-  return gather('grid gap-6 lg:grid-cols-[1.5fr_1fr]', [codeBlock('README.md', 'markdown', LAUNCH.readme, true), side]);
-}
-
-function buildArchitecture() {
-  const kinds = DIAGRAM_KINDS.filter(([key]) => LAUNCH[key]);
-  const contracts = codeBlock('TypeScript contracts', 'ts', LAUNCH.contracts);
-  if (kinds.length === 0) return gather('grid gap-6', [contracts]);
-  diagramKind = kinds[0][0];
-  const panel = node('div', 'grid gap-6');
-  const bar = node('div', 'flex flex-wrap items-center justify-between gap-3');
-  const seg = node('fieldset', 'seg border-0 m-0');
-  seg.appendChild(node('legend', 'sr-only', 'Diagram type'));
-  kinds.forEach(([key, label], i) => {
-    const l = node('label');
-    const input = document.createElement('input');
-    input.type = 'radio';
-    input.name = 'diagram';
-    input.value = key;
-    input.checked = i === 0;
-    input.addEventListener('change', () => { diagramKind = key; renderDiagram(); });
-    l.append(input, node('span', '', label));
-    seg.appendChild(l);
-  });
-  bar.appendChild(seg);
-
-  const diagram = node('section', 'block');
-  const head = node('div', 'block-head');
-  const meta = node('div', 'block-meta');
-  meta.append(node('h3', '', 'Diagram'), node('span', 'lang', 'mermaid'));
-  const btn = node('button', 'btn', 'Copy source');
-  btn.type = 'button';
-  btn.addEventListener('click', async () => {
-    const ok = await copyText(LAUNCH[diagramKind]);
-    flashButton(btn, ok, 'Copy source');
-  });
-  head.append(meta, btn);
-  const host = node('div', 'diagram-host');
-  host.id = 'diagram-host';
-  host.setAttribute('role', 'img');
-  host.setAttribute('aria-label', 'Rendered Mermaid diagram');
-  diagram.append(head, host);
-
-  if (kinds.length > 1) panel.appendChild(bar);
-  panel.appendChild(diagram);
-  if (contracts) panel.appendChild(contracts);
-  return panel;
-}
-
-function mermaidTheme() {
-  const cs = getComputedStyle(document.documentElement);
-  const v = (name) => cs.getPropertyValue(name).trim();
-  return {
-    background: v('--bg-surface'),
-    primaryColor: v('--bg-raised'),
-    primaryTextColor: v('--fg-primary'),
-    primaryBorderColor: v('--accent'),
-    secondaryColor: v('--bg-raised'),
-    tertiaryColor: v('--bg-surface'),
-    lineColor: v('--fg-muted'),
-    textColor: v('--fg-primary'),
-    noteBkgColor: v('--bg-raised'),
-    noteTextColor: v('--fg-primary'),
-    actorBkg: v('--bg-raised'),
-    actorBorder: v('--accent'),
-    actorTextColor: v('--fg-primary'),
-    signalColor: v('--fg-muted'),
-    signalTextColor: v('--fg-primary'),
-    fontFamily: v('--font-sans')
-  };
-}
-
-let renderCount = 0;
-async function renderDiagram() {
-  const host = $('diagram-host');
-  if (!host) return;
-  const source = LAUNCH[diagramKind];
-  if (!window.mermaid) {
-    host.textContent = '';
-    host.appendChild(node('pre', 'code', source));
+/**
+ * Strict allowlist SVG sanitizer (SEC-02): blocks script, on* handlers, foreignObject,
+ * external hrefs, and HTML injection while preserving safe geometric primitives.
+ */
+function renderSanitizedLogo(rawSvg) {
+  const box = $('logo-box');
+  box.replaceChildren();
+  if (typeof rawSvg !== 'string' || !rawSvg.trim()) {
+    box.appendChild(fallbackLogoSvg());
     return;
   }
   try {
-    window.mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'strict', themeVariables: mermaidTheme() });
-    renderCount += 1;
-    const { svg } = await window.mermaid.render('vc-diagram-' + renderCount, source);
-    host.innerHTML = svg;
-  } catch (error) {
-    host.textContent = '';
-    host.appendChild(node('pre', 'code', source));
+    const parser = new DOMParser();
+    let doc = parser.parseFromString(rawSvg, 'image/svg+xml');
+    let root = doc.querySelector('parsererror') ? null : doc.documentElement;
+    if (!root || root.tagName.toLowerCase() !== 'svg') {
+      // Inert HTML document parse fallback (never executes scripts or fetches images)
+      doc = parser.parseFromString(rawSvg, 'text/html');
+      root = doc.querySelector('svg');
+    }
+    if (!root || root.tagName.toLowerCase() !== 'svg') {
+      box.appendChild(fallbackLogoSvg());
+      return;
+    }
+
+    const cloneClean = (srcNode) => {
+      const tag = srcNode.tagName ? srcNode.tagName.toLowerCase() : '';
+      if (!SAFE_SVG_TAGS.has(tag)) return null;
+      const cleanEl = document.createElementNS(SVG_NS, tag);
+      for (const attr of Array.from(srcNode.attributes || [])) {
+        const name = attr.name;
+        const val = String(attr.value || '').trim();
+        if (!SAFE_SVG_ATTRS.has(name)) continue;
+        if (/^(?:javascript|data|vbscript):/i.test(val) || /url\s*\(/i.test(val)) continue;
+        cleanEl.setAttribute(name, val);
+      }
+      for (const child of Array.from(srcNode.children || [])) {
+        const cleanChild = cloneClean(child);
+        if (cleanChild) cleanEl.appendChild(cleanChild);
+      }
+      return cleanEl;
+    };
+
+    const safeSvg = cloneClean(root);
+    if (!safeSvg || safeSvg.children.length === 0) {
+      box.appendChild(fallbackLogoSvg());
+      return;
+    }
+    if (!safeSvg.getAttribute('viewBox')) {
+      safeSvg.setAttribute('viewBox', '0 0 64 64');
+    }
+    box.appendChild(safeSvg);
+  } catch (_err) {
+    box.appendChild(fallbackLogoSvg());
   }
 }
 
-function buildAssets() {
-  const logos = node('section', 'block');
-  const head = node('div', 'block-head');
-  head.appendChild(node('h3', '', 'Logo at 16, 32, 64 and 512 px'));
-  logos.appendChild(head);
-  const row = node('div', 'logo-row bg-check');
-  [16, 32, 64, 512].forEach((size) => {
-    const cell = node('div', 'logo-cell');
-    const box = node('div', 'logo-box');
-    box.style.width = size === 512 ? 'min(512px, 100%)' : size + 'px';
-    box.innerHTML = LAUNCH.logo;
-    cell.append(box, node('span', 'muted mono', size + ' px'));
-    if (size === 512) cell.style.width = 'min(512px, 100%)';
-    row.appendChild(cell);
-  });
-  logos.appendChild(row);
+const CONTRACT_LABELS = {
+  ts: 'TypeScript contracts',
+  rust: 'Rust type contracts',
+  python: 'Python schema contracts',
+  go: 'Go interface contracts',
+  sql: 'SQL schema contracts'
+};
 
-  const prompts = gather('grid gap-6 lg:grid-cols-2', [codeBlock('Midjourney v6 prompt', 'prompt', LAUNCH.midjourney, true), codeBlock('DALL-E 3 prompt', 'prompt', LAUNCH.dalle, true)]);
-  return gather('grid gap-6', [LAUNCH.logo ? logos : null, codeBlock('Logo SVG', 'svg', LAUNCH.logo), prompts]);
+function bundleMarkdown() {
+  const d = LAUNCH && typeof LAUNCH === 'object' ? LAUNCH : {};
+  const projectName = d.name || d.title || 'Project';
+  const lang = String(d.contractsLang || 'ts').toLowerCase();
+  const steps = Array.isArray(d.nextSteps) ? d.nextSteps : [];
+  return [
+    '# ' + projectName + ' Launchpad',
+    '',
+    d.tagline || '',
+    '',
+    '## Quickstart',
+    '',
+    d.readme || '',
+    '',
+    '```sh',
+    d.commands || '',
+    '```',
+    '',
+    '## File Tree',
+    '',
+    '```text',
+    d.tree || '',
+    '```',
+    '',
+    '## System Flow (Mermaid)',
+    '',
+    '```mermaid',
+    d.flow || '',
+    '```',
+    '',
+    '## Critical Sequence (Mermaid)',
+    '',
+    '```mermaid',
+    d.sequence || '',
+    '```',
+    '',
+    '## ' + (CONTRACT_LABELS[lang] || 'Domain contracts'),
+    '',
+    '```' + lang,
+    d.contracts || '',
+    '```',
+    '',
+    '## Next Steps',
+    '',
+    ...steps.map((s, i) => (i + 1) + '. ' + s)
+  ].join('\n') + '\n';
 }
 
-function buildNext() {
-  const cards = LAUNCH.nextSteps.filter((step) => step.prompt).map((step) =>
-    gather('grid gap-3 content-start', [node('span', 'tool-tag', 'For ' + step.tool), codeBlock(step.title, step.tool.toLowerCase(), step.prompt, true)])
-  );
-  return gather('grid gap-6 lg:grid-cols-3', cards);
+function makeCodeSection(title, codeText, copyLabel) {
+  const wrap = document.createElement('section');
+  wrap.className = 'panel';
+  const head = document.createElement('div');
+  head.className = 'sec-head';
+  const h2 = document.createElement('h2');
+  h2.textContent = title;
+  head.appendChild(h2);
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'btn no-print';
+  btn.textContent = copyLabel || 'Copy';
+  btn.addEventListener('click', () => copyWithFallback(codeText || '', btn, 'Copied ✓'));
+  head.appendChild(btn);
+  wrap.appendChild(head);
+
+  const pre = document.createElement('pre');
+  pre.className = 'code-block';
+  pre.tabIndex = 0;
+  pre.setAttribute('aria-label', title + ' code block');
+  pre.textContent = codeText || '(empty)';
+  wrap.appendChild(pre);
+  return wrap;
 }
 
-const TABS = [
-  { key: 'docs', label: 'Documentation', build: buildDocs },
-  { key: 'architecture', label: 'Architecture', build: buildArchitecture },
-  { key: 'assets', label: 'Asset Prompts', build: buildAssets },
-  { key: 'next', label: 'Next Steps', build: buildNext }
-];
+async function renderDiagramInto(container, idSuffix, sourceText) {
+  container.replaceChildren();
+  const src = String(sourceText || '').trim();
+  if (!src) {
+    const p = document.createElement('p');
+    p.className = 'muted';
+    p.textContent = 'No diagram defined.';
+    container.appendChild(p);
+    return;
+  }
 
-function allText() {
-  const parts = [
-    ['README.md', LAUNCH.readme],
-    ['Setup commands', LAUNCH.commands],
-    ['File tree', LAUNCH.tree],
-    ['User journey (mermaid)', LAUNCH.flow],
-    ['Lifecycle (mermaid)', LAUNCH.sequence],
-    ['TypeScript contracts', LAUNCH.contracts],
-    ['Logo SVG', LAUNCH.logo],
-    ['Midjourney v6 prompt', LAUNCH.midjourney],
-    ['DALL-E 3 prompt', LAUNCH.dalle]
-  ];
-  LAUNCH.nextSteps.forEach((s) => parts.push(['Next step for ' + s.tool + ': ' + s.title, s.prompt]));
-  return LAUNCH.name + ' launchpad\n\n' + parts.filter(([, text]) => text).map(([title, text]) => '## ' + title + '\n\n' + text).join('\n\n');
+  if (typeof window.mermaid !== 'undefined' && window.mermaid && typeof window.mermaid.render === 'function') {
+    try {
+      const out = await window.mermaid.render('vc-mmd-' + idSuffix, src);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(out.svg, 'image/svg+xml');
+      if (!doc.querySelector('parsererror') && doc.documentElement) {
+        container.appendChild(document.importNode(doc.documentElement, true));
+        $('mermaid-mode').textContent = 'Mermaid 11.4.1 (SRI verified) · Sanitized SVG';
+        return;
+      }
+    } catch (err) {
+      container.dataset.mermaidFallback = String((err && err.message) || 'render-error');
+    }
+  }
+
+  $('mermaid-mode').textContent = 'Offline diagram source view · Sanitized SVG';
+  const note = document.createElement('p');
+  note.className = 'muted mono';
+  note.style.fontSize = '0.76rem';
+  note.style.marginBlockEnd = '8px';
+  note.textContent = 'Mermaid source (offline / fallback view):';
+  container.appendChild(note);
+  const pre = document.createElement('pre');
+  pre.className = 'code-block';
+  pre.tabIndex = 0;
+  pre.setAttribute('aria-label', 'Mermaid diagram source');
+  pre.textContent = src;
+  container.appendChild(pre);
 }
 
-function selectTab(key, focus) {
-  TABS.forEach((t) => {
-    const selected = t.key === key;
-    const tab = $('tab-' + t.key);
-    tab.setAttribute('aria-selected', String(selected));
-    tab.tabIndex = selected ? 0 : -1;
-    $('panel-' + t.key).hidden = !selected;
-    if (selected && focus) tab.focus();
-  });
-  if (key === 'architecture') renderDiagram();
-}
+let activeTabIdx = 0;
 
-function buildTabs() {
-  const list = $('tablist');
-  const panels = $('panels');
-  TABS.forEach((t) => { t.el = t.build(); });
-  TABS.splice(0, TABS.length, ...TABS.filter((t) => t.el));
-  TABS.forEach((t, i) => {
-    const tab = node('button', 'tab', t.label);
-    tab.type = 'button';
-    tab.id = 'tab-' + t.key;
-    tab.setAttribute('role', 'tab');
-    tab.setAttribute('aria-controls', 'panel-' + t.key);
-    tab.addEventListener('click', () => selectTab(t.key, false));
-    tab.addEventListener('keydown', (event) => {
-      const last = TABS.length - 1;
-      let next = -1;
-      if (event.key === 'ArrowRight') next = i === last ? 0 : i + 1;
-      else if (event.key === 'ArrowLeft') next = i === 0 ? last : i - 1;
-      else if (event.key === 'Home') next = 0;
-      else if (event.key === 'End') next = last;
-      if (next >= 0) { event.preventDefault(); selectTab(TABS[next].key, true); }
+async function initLaunchpad() {
+  if (!LAUNCH || typeof LAUNCH !== 'object') {
+    $('panels-root').appendChild(
+      Object.assign(document.createElement('div'), {
+        className: 'empty-state',
+        textContent: 'LAUNCH payload is missing or malformed.'
+      })
+    );
+    $('copy-all-btn').disabled = true;
+    $('download-md-btn').disabled = true;
+    return;
+  }
+
+  const projectName = LAUNCH.name || LAUNCH.title || 'Project';
+  $('phase-label').textContent = LAUNCH.phase || 'Phase 4 of 4 · Launchpad';
+  $('title-heading').textContent = LAUNCH.title || (projectName + ' is ready to launch');
+  $('tagline-text').textContent = LAUNCH.tagline || '';
+  renderSanitizedLogo(LAUNCH.logo);
+
+  if (typeof window.mermaid !== 'undefined' && window.mermaid) {
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: prefersLight ? 'neutral' : 'dark'
     });
-    list.appendChild(tab);
+  }
 
-    const panel = node('div');
-    panel.id = 'panel-' + t.key;
+  const langKey = String(LAUNCH.contractsLang || 'ts').toLowerCase();
+  const contractsTitle = CONTRACT_LABELS[langKey] || 'Domain contracts';
+
+  const tabs = [
+    { id: 'overview', label: 'Runbook & Tree' },
+    { id: 'architecture', label: 'Architecture Diagrams' },
+    { id: 'contracts', label: contractsTitle },
+    { id: 'brand', label: 'Brand & Next Steps' }
+  ];
+
+  const tablist = $('tablist');
+  const panelsRoot = $('panels-root');
+  tablist.replaceChildren();
+  panelsRoot.replaceChildren();
+
+  const panelEls = [];
+
+  tabs.forEach((tab, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tab-btn';
+    btn.id = 'tab-' + tab.id;
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-controls', 'panel-' + tab.id);
+    btn.setAttribute('aria-selected', idx === activeTabIdx ? 'true' : 'false');
+    btn.tabIndex = idx === activeTabIdx ? 0 : -1;
+    btn.textContent = tab.label;
+
+    btn.addEventListener('click', () => activateTab(idx, false));
+    btn.addEventListener('keydown', (ev) => {
+      if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(ev.key)) {
+        ev.preventDefault();
+        let next = idx;
+        if (ev.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+        else if (ev.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+        else if (ev.key === 'Home') next = 0;
+        else if (ev.key === 'End') next = tabs.length - 1;
+        activateTab(next, true);
+      }
+    });
+    tablist.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.id = 'panel-' + tab.id;
+    panel.className = 'tab-panel stack-sections';
     panel.setAttribute('role', 'tabpanel');
-    panel.setAttribute('aria-labelledby', 'tab-' + t.key);
-    panel.appendChild(t.el);
-    panels.appendChild(panel);
+    panel.setAttribute('aria-labelledby', btn.id);
+    panel.hidden = idx !== activeTabIdx;
+    panelEls.push(panel);
+    panelsRoot.appendChild(panel);
   });
+
+  function activateTab(idx, moveFocus) {
+    activeTabIdx = idx;
+    const btns = tablist.querySelectorAll('[role="tab"]');
+    btns.forEach((b, i) => {
+      b.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+      b.tabIndex = i === idx ? 0 : -1;
+      if (i === idx && moveFocus) b.focus();
+    });
+    panelEls.forEach((p, i) => {
+      p.hidden = i !== idx;
+    });
+  }
+
+  // Panel 0: Runbook & Tree
+  const readmePanel = document.createElement('section');
+  readmePanel.className = 'panel';
+  const rHead = document.createElement('h2');
+  rHead.style.marginBlockEnd = '8px';
+  rHead.textContent = 'Operator summary';
+  readmePanel.appendChild(rHead);
+  const rBody = document.createElement('p');
+  rBody.textContent = LAUNCH.readme || 'No operator summary provided.';
+  readmePanel.appendChild(rBody);
+  panelEls[0].appendChild(readmePanel);
+  panelEls[0].appendChild(makeCodeSection('Commands', LAUNCH.commands, 'Copy commands'));
+  panelEls[0].appendChild(makeCodeSection('Project file tree', LAUNCH.tree, 'Copy tree'));
+
+  // Panel 1: Architecture Diagrams
+  const flowSec = document.createElement('section');
+  flowSec.className = 'panel';
+  const flowHead = document.createElement('div');
+  flowHead.className = 'sec-head';
+  flowHead.appendChild(Object.assign(document.createElement('h2'), { textContent: 'Component & data flow' }));
+  const copyFlowBtn = document.createElement('button');
+  copyFlowBtn.type = 'button';
+  copyFlowBtn.className = 'btn no-print';
+  copyFlowBtn.textContent = 'Copy Mermaid';
+  copyFlowBtn.addEventListener('click', () => copyWithFallback(LAUNCH.flow || '', copyFlowBtn, 'Copied ✓'));
+  flowHead.appendChild(copyFlowBtn);
+  flowSec.appendChild(flowHead);
+  const flowBox = document.createElement('div');
+  flowBox.className = 'diagram-box';
+  flowSec.appendChild(flowBox);
+  panelEls[1].appendChild(flowSec);
+
+  const seqSec = document.createElement('section');
+  seqSec.className = 'panel';
+  const seqHead = document.createElement('div');
+  seqHead.className = 'sec-head';
+  seqHead.appendChild(Object.assign(document.createElement('h2'), { textContent: 'Critical-path sequence' }));
+  const copySeqBtn = document.createElement('button');
+  copySeqBtn.type = 'button';
+  copySeqBtn.className = 'btn no-print';
+  copySeqBtn.textContent = 'Copy Mermaid';
+  copySeqBtn.addEventListener('click', () => copyWithFallback(LAUNCH.sequence || '', copySeqBtn, 'Copied ✓'));
+  seqHead.appendChild(copySeqBtn);
+  seqSec.appendChild(seqHead);
+  const seqBox = document.createElement('div');
+  seqBox.className = 'diagram-box';
+  seqSec.appendChild(seqBox);
+  panelEls[1].appendChild(seqSec);
+
+  // Panel 2: Contracts
+  panelEls[2].appendChild(makeCodeSection(contractsTitle, LAUNCH.contracts, 'Copy contracts'));
+
+  // Panel 3: Brand & Next Steps
+  panelEls[3].appendChild(makeCodeSection('Sanitized geometric SVG mark', LAUNCH.logo, 'Copy SVG'));
+  if (LAUNCH.midjourney) {
+    panelEls[3].appendChild(makeCodeSection('Midjourney exploration prompt', LAUNCH.midjourney, 'Copy prompt'));
+  }
+  if (LAUNCH.dalle) {
+    panelEls[3].appendChild(makeCodeSection('Icon generation prompt', LAUNCH.dalle, 'Copy prompt'));
+  }
+  const stepsSec = document.createElement('section');
+  stepsSec.className = 'panel';
+  stepsSec.appendChild(Object.assign(document.createElement('h2'), { textContent: 'Recommended next steps', style: 'margin-block-end: 8px;' }));
+  const steps = Array.isArray(LAUNCH.nextSteps) ? LAUNCH.nextSteps : [];
+  if (steps.length === 0) {
+    stepsSec.appendChild(Object.assign(document.createElement('p'), { className: 'muted', textContent: 'No post-launch steps listed.' }));
+  } else {
+    const ol = document.createElement('ol');
+    ol.className = 'steps-list';
+    steps.forEach((st) => {
+      const li = document.createElement('li');
+      li.textContent = st;
+      ol.appendChild(li);
+    });
+    stepsSec.appendChild(ol);
+  }
+  panelEls[3].appendChild(stepsSec);
+
+  await renderDiagramInto(flowBox, 'flow', LAUNCH.flow);
+  await renderDiagramInto(seqBox, 'seq', LAUNCH.sequence);
 }
 
-async function copyAll() {
-  const ok = await copyText(allText());
-  const status = $('status');
-  window.clearTimeout(statusTimer);
-  status.textContent = ok ? 'Everything copied. Paste it into a new file or chat.' : 'Clipboard is blocked here. Use the Copy buttons on each block, or select the text.';
-  statusTimer = window.setTimeout(() => { status.textContent = ''; }, 4000);
-}
-
-$('phase').textContent = LAUNCH.phase || 'Phase 4 of 4 · Launchpad';
-$('title').textContent = LAUNCH.title || LAUNCH.name + ' is ready to launch';
-$('tagline').textContent = LAUNCH.tagline;
-buildTabs();
-selectTab(TABS[0].key, false);
-$('copy-all').addEventListener('click', copyAll);
-window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
-  const panel = $('panel-architecture');
-  if (panel && !panel.hidden) renderDiagram();
+$('copy-all-btn').addEventListener('click', () => {
+  copyWithFallback(bundleMarkdown(), $('copy-all-btn'), 'Copied bundle ✓');
 });
+
+$('download-md-btn').addEventListener('click', () => {
+  downloadBlob('launchpad-bundle.md', bundleMarkdown(), 'text/markdown;charset=utf-8');
+});
+
+initLaunchpad();
 </script>
 </body>
 </html>

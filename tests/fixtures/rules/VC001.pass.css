@@ -1,0 +1,5 @@
+:root {
+  --bg-primary: #0b0c0e;
+  --accent: #7c89ff;
+}
+.panel { background: var(--bg-primary); color: var(--accent); }

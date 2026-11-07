@@ -1,534 +1,1108 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>VibeCraft Brand Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:wght@500;600&display=swap">
-<script src="https://cdn.tailwindcss.com"></script>
+<title>VibeCraft · Phase 2 Brand Studio</title>
 <style>
 :root {
-  --bg-primary: #09090b;
-  --bg-surface: #18181b;
-  --bg-raised: #27272a;
-  --fg-primary: #ededef;
-  --fg-muted: #9a9aa5;
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #5e6ad2;
-  --accent-2: #22d3ee;
-  --accent-fg: #fafafa;
-  --success: #4ade80;
-  --danger: #f87171;
+  --bg-primary: #0b0c0e;
+  --bg-surface: #121417;
+  --bg-raised: #191c21;
+  --fg-primary: #f4f5f8;
+  --fg-muted: #8c93a3;
+  --border: rgba(244, 245, 248, 0.10);
+  --border-strong: rgba(244, 245, 248, 0.22);
+  --accent: #7c89ff;
+  --accent-fg: #0b0c0e;
+  --accent-soft: rgba(124, 137, 255, 0.12);
+  --success: #3dd68c;
+  --success-soft: rgba(61, 214, 140, 0.12);
+  --warn: #f5a623;
+  --warn-soft: rgba(245, 166, 35, 0.12);
+  --danger: #ff7373;
+  --danger-soft: rgba(255, 115, 115, 0.12);
   --radius: 8px;
-  --radius-btn: 8px;
-  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
-  --blur: 0px;
-  --shape-opacity: 0;
+  --radius-sm: 6px;
+  --shadow-overlay: 0 10px 28px rgba(0, 0, 0, 0.42);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 }
-
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #f6f6f4;
+    --bg-surface: #fcfcfa;
+    --bg-raised: #ebebea;
+    --fg-primary: #161618;
+    --fg-muted: #525259;
+    --border: rgba(22, 22, 24, 0.12);
+    --border-strong: rgba(22, 22, 24, 0.26);
+    --accent: #3b46b8;
+    --accent-fg: #fcfcfa;
+    --accent-soft: rgba(59, 70, 184, 0.09);
+    --success: #136c2e;
+    --success-soft: rgba(19, 108, 46, 0.10);
+    --warn: #854800;
+    --warn-soft: rgba(133, 72, 0, 0.10);
+    --danger: #b01c12;
+    --danger-soft: rgba(176, 28, 18, 0.10);
+    --shadow-overlay: 0 8px 24px rgba(22, 22, 24, 0.08);
+  }
+}
 *, *::before, *::after { box-sizing: border-box; }
-.grid > * { min-width: 0; }
-html { color-scheme: light dark; }
-body {
+html, body {
   margin: 0;
-  background-color: var(--bg-primary);
+  padding: 0;
+  background: var(--bg-primary);
   color: var(--fg-primary);
   font-family: var(--font-sans);
   font-size: 15px;
-  line-height: 1.55;
-  transition: background-color 200ms ease-out, color 200ms ease-out;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-body h1, body h2, body h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; letter-spacing: -0.01em; }
-body h1 { font-size: 28px; font-weight: 600; }
-body h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
-p { margin: 0; }
-.mono { font-family: var(--font-mono); }
-.num { font-variant-numeric: tabular-nums; }
-
-.surface {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur));
-  transition: background-color 200ms ease-out, border-color 200ms ease-out;
+.shell {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-block: 24px 40px;
+  padding-inline: 16px;
 }
-
-.pill {
-  display: inline-flex; align-items: center; gap: 8px;
-  height: 28px; padding: 0 12px;
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  background-color: var(--bg-surface);
-  font-size: 13px; font-weight: 500;
+@media (min-width: 768px) {
+  .shell { padding-inline: 28px; }
 }
-.pill-dot { width: 8px; height: 8px; border-radius: 9999px; background-color: var(--accent); }
-
-.card {
-  display: grid; gap: 8px; padding: 16px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
+.eyebrow {
+  margin: 0 0 4px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
 }
-.card:hover { background-color: var(--bg-raised); }
-.card:active { transform: translateY(1px); }
-.card:has(input:checked) { border-color: var(--accent); background-color: var(--bg-raised); }
-.card:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
-.card-name { font-weight: 600; }
-.card-tag { color: var(--fg-muted); font-size: 13px; }
-.swatches { display: flex; gap: 4px; }
-.swatch { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border); }
-
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+p { margin: 0; overflow-wrap: anywhere; }
+.muted { color: var(--fg-muted); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tabular { font-variant-numeric: tabular-nums; }
+.header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-end: 20px;
+  padding-block-end: 16px;
+  border-block-end: 1px solid var(--border);
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  height: 40px; padding: 0 16px;
-  border-radius: var(--radius-btn);
-  border: 1px solid transparent;
-  font: inherit; font-weight: 600; font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  min-width: 38px;
+  padding-block: 8px;
+  padding-inline: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 550;
+  text-align: start;
   cursor: pointer;
-  transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out, opacity 150ms ease-out;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, opacity 140ms ease;
 }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn:active:not(:disabled) { transform: translateY(1px); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background-color: var(--accent); color: var(--accent-fg); }
-.btn-primary:hover:not(:disabled) { background-color: color-mix(in srgb, var(--accent) 86%, var(--fg-primary)); }
-.btn-secondary { background-color: transparent; color: var(--fg-primary); border-color: var(--border); }
-.btn-secondary:hover:not(:disabled) { background-color: var(--bg-raised); }
-.btn[data-loading="true"]::before {
-  content: ""; width: 14px; height: 14px; border-radius: 9999px;
-  border: 2px solid currentColor; border-right-color: transparent;
-  animation: spin 700ms linear infinite;
+.btn:hover:not(:disabled) {
+  background: var(--bg-raised);
+  border-color: var(--border-strong);
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.field { display: grid; gap: 6px; }
-.label { font-size: 13px; font-weight: 500; }
-.input {
-  height: 40px; padding: 0 12px; width: 100%;
-  background-color: var(--bg-raised); color: var(--fg-primary);
-  border: 1px solid var(--border); border-radius: var(--radius);
-  font: inherit;
-  transition: border-color 150ms ease-out, background-color 150ms ease-out;
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
-.input::placeholder { color: var(--fg-muted); }
-.input:hover { border-color: var(--fg-muted); }
-.input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
-.input[aria-invalid="true"] { border-color: var(--danger); }
-.help { font-size: 13px; color: var(--fg-muted); }
-.error { font-size: 13px; color: var(--danger); }
-
-.metric-value { font-family: var(--font-display); font-size: 36px; font-weight: 600; line-height: 1.1; }
-.chip { display: inline-flex; padding: 2px 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; color: var(--success); background-color: color-mix(in srgb, var(--success) 14%, transparent); }
-
-.track { height: 8px; border-radius: 9999px; background-color: var(--bg-raised); overflow: hidden; }
-.fill { height: 100%; width: 100%; border-radius: 9999px; background-color: var(--accent-2); transform-origin: left center; transform: scaleX(var(--progress, 0)); transition: transform 250ms ease-out; }
-
-.dd { position: relative; display: inline-block; }
-.dd-list {
-  position: absolute; top: calc(100% + 6px); left: 0; min-width: 100%; margin: 0; padding: 4px; list-style: none;
-  background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius);
-  box-shadow: var(--shadow-overlay);
-  backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
-  opacity: 0; visibility: hidden; transform: translateY(-4px);
-  transition: opacity 150ms ease-in, transform 150ms ease-in, visibility 0s linear 150ms;
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
-.dd.open .dd-list { opacity: 1; visibility: visible; transform: none; transition: opacity 150ms ease-out, transform 150ms ease-out, visibility 0s; }
-.dd-item { padding: 8px 12px; border-radius: calc(var(--radius) - 2px); cursor: pointer; font-size: 14px; white-space: nowrap; }
-.dd-item[aria-selected="true"] { font-weight: 600; }
-.dd-item:hover, .dd-item.active { background-color: var(--bg-raised); }
-
-.stage { position: relative; isolation: isolate; overflow: hidden; }
-.shape { position: absolute; z-index: -1; border-radius: 9999px; background-color: var(--accent); opacity: var(--shape-opacity); transition: opacity 200ms ease-out; }
-.shape-a { width: 220px; height: 220px; top: -60px; right: 8%; }
-.shape-b { width: 160px; height: 160px; bottom: -40px; left: 30%; background-color: var(--accent-2); }
-
-.token-row { display: grid; grid-template-columns: 20px max-content 1fr; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); font-size: 13px; }
-.token-row > :last-child { text-align: right; overflow-wrap: anywhere; }
-.token-chip { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border); }
-.toast { min-height: 20px; font-size: 13px; color: var(--fg-muted); }
-
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: transparent;
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--fg-primary);
+  opacity: 0.92;
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--fg-primary);
+  outline-offset: 2px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tag-verified { background: var(--success-soft); color: var(--success); }
+.tag-inferred { background: var(--accent-soft); color: var(--accent); }
+.tag-gotcha, .tag-warn { background: var(--warn-soft); color: var(--warn); }
+.tag-danger { background: var(--danger-soft); color: var(--danger); }
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-width: 0;
+}
+.empty-state {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  color: var(--fg-muted);
+}
+.fallback-wrap {
+  margin-block-start: 12px;
+}
+.fallback-box {
+  width: 100%;
+  min-height: 110px;
+  margin-block-start: 6px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.fallback-box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.footer-bar {
+  margin-block-start: 24px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.84rem;
+  color: var(--fg-muted);
+}
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+@media print {
+  body { background: var(--bg-surface); }
+  .no-print { display: none !important; }
+  .shell { max-width: 100%; padding: 0; }
+  .panel { break-inside: avoid; }
+}
+.studio-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 900px) {
+  .studio-layout { grid-template-columns: 330px minmax(0, 1fr); }
+}
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.preset-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  text-align: start;
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+.preset-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-raised);
+}
+.preset-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.preset-btn[aria-checked="true"] {
+  border-color: var(--accent);
+  background: var(--bg-raised);
+}
+.preset-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+.swatches {
+  display: inline-flex;
+  gap: 4px;
+}
+.swatch-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+}
+.stage {
+  border-radius: var(--stage-radius, 8px);
+  border: 1px solid var(--stage-border, var(--border));
+  background: var(--stage-bg, var(--bg-primary));
+  color: var(--stage-fg, var(--fg-primary));
+  font-family: var(--stage-font-sans, var(--font-sans));
+  padding: 20px;
+  min-width: 0;
+}
+.stage-card {
+  border-radius: var(--stage-radius, 8px);
+  border: 1px solid var(--stage-border, var(--border));
+  background: var(--stage-surface, var(--bg-surface));
+  box-shadow: var(--stage-shadow, none);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.stage-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.stage-title {
+  font-family: var(--stage-font-display, var(--font-display));
+  font-size: 1.3rem;
+  font-weight: 650;
+}
+.stage-chip {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 3px;
+  padding-inline: 10px;
+  border-radius: var(--stage-radius-btn, 6px);
+  background: var(--stage-chip-bg);
+  color: var(--stage-success);
+  font-family: var(--stage-font-mono, var(--font-mono));
+  font-size: 12px;
+  font-weight: 600;
+}
+.stage-kpi {
+  font-family: var(--stage-font-display, var(--font-display));
+  font-size: 2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.stage-progress-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--stage-raised);
+  overflow: hidden;
+}
+.stage-progress-fill {
+  height: 100%;
+  background: var(--stage-accent-2);
+}
+.stage-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .stage-controls { grid-template-columns: 1fr 1fr; }
+}
+.stage-label {
+  display: block;
+  font-size: 0.8rem;
+  margin-block-end: 4px;
+  color: var(--stage-muted);
+}
+.stage-input, .dd-trigger {
+  width: 100%;
+  min-height: 38px;
+  padding-block: 7px;
+  padding-inline: 11px;
+  border-radius: var(--stage-radius-btn, 6px);
+  border: 1px solid var(--stage-border);
+  background: var(--stage-raised);
+  color: var(--stage-fg);
+  font-family: var(--stage-font-sans);
+  font-size: 0.88rem;
+  text-align: start;
+}
+.stage-input:focus-visible, .dd-trigger:focus-visible {
+  outline: 2px solid var(--stage-accent);
+  outline-offset: 2px;
+}
+.dd-wrap { position: relative; }
+.dd-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.dd-trigger:hover {
+  border-color: var(--stage-fg);
+}
+.dd-menu {
+  position: absolute;
+  inset-inline: 0;
+  margin-block-start: 4px;
+  padding: 4px;
+  list-style: none;
+  border-radius: var(--stage-radius, 8px);
+  border: 1px solid var(--stage-border);
+  background: var(--stage-surface);
+  box-shadow: var(--stage-shadow);
+  z-index: 30;
+}
+.dd-option {
+  padding-block: 8px;
+  padding-inline: 10px;
+  min-height: 36px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.86rem;
+}
+.dd-option:hover, .dd-option[aria-selected="true"] {
+  background: var(--stage-raised);
+}
+.dd-option:focus-visible {
+  outline: 2px solid var(--stage-accent);
+  outline-offset: -2px;
+}
+.stage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.stage-btn-primary, .stage-btn-secondary {
+  min-height: 38px;
+  padding-block: 8px;
+  padding-inline: 14px;
+  border-radius: var(--stage-radius-btn, 6px);
+  font-family: var(--stage-font-sans);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 140ms ease, border-color 140ms ease;
+}
+.stage-btn-primary {
+  background: var(--stage-accent);
+  color: var(--stage-accent-fg);
+  border: 1px solid transparent;
+}
+.stage-btn-primary:hover { opacity: 0.9; }
+.stage-btn-primary:focus-visible {
+  outline: 2px solid var(--stage-fg);
+  outline-offset: 2px;
+}
+.stage-btn-secondary {
+  background: var(--stage-raised);
+  color: var(--stage-fg);
+  border: 1px solid var(--stage-border);
+}
+.stage-btn-secondary:hover:not(:disabled) { border-color: var(--stage-fg); }
+.stage-btn-secondary:focus-visible {
+  outline: 2px solid var(--stage-accent);
+  outline-offset: 2px;
+}
+.stage-btn-secondary:disabled { opacity: 0.48; cursor: not-allowed; }
+.contrast-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 14px;
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+.token-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+  gap: 8px;
+  margin-block-start: 14px;
+}
+.token-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  font-size: 0.78rem;
+}
+.color-picker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+.color-picker:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 </style>
 </head>
 <body>
-<div class="min-h-screen px-4 py-6 md:px-8 md:py-10">
-  <header class="flex flex-wrap items-end justify-between gap-4 pb-8">
-    <div class="grid gap-2">
-      <h2>Phase 2 of 4 · Brand Artisan</h2>
-      <h1>Pick the look. Everything below re-themes live.</h1>
+<div class="shell">
+  <header class="header-row">
+    <div>
+      <p class="eyebrow">Phase 2 of 4 · Brand Artisan</p>
+      <h1>Lock your design tokens</h1>
+      <p class="muted">Compare dark and light archetypes, verify live WCAG 2.2 AA contrast, and copy your 19-key CSS contract.</p>
     </div>
-    <span class="pill" aria-live="polite"><span class="pill-dot"></span><span id="active-pill">Active: Linear Dark</span></span>
+    <div class="toolbar no-print">
+      <button type="button" class="btn btn-primary" id="lock-btn">Lock &amp; copy tokens</button>
+      <button type="button" class="btn" id="download-css-btn">Download tokens.css</button>
+    </div>
   </header>
 
-  <main class="grid gap-8 lg:grid-cols-[320px_1fr]">
-    <fieldset class="grid content-start gap-3 border-0 p-0 m-0">
-      <legend class="sr-only">Aesthetic archetype</legend>
-      <div id="cards" class="grid gap-3"></div>
-    </fieldset>
+  <main id="main-content" class="studio-layout">
+    <section aria-labelledby="presets-heading">
+      <h2 id="presets-heading" style="margin-block-end: 10px;">Archetypes (3 dark · 3 light)</h2>
+      <div id="preset-list" class="preset-list" role="radiogroup" aria-labelledby="presets-heading"></div>
+    </section>
 
-    <div class="grid content-start gap-6">
-      <section class="surface stage p-5 md:p-8" aria-labelledby="preview-title">
-        <span class="shape shape-a"></span>
-        <span class="shape shape-b"></span>
-        <h2 id="preview-title" class="mb-6">Live preview · Voice memo app</h2>
-
-        <div class="grid gap-6 md:grid-cols-2">
-          <div class="surface p-5 grid gap-1">
-            <p class="help">Memos transcribed</p>
-            <p class="metric-value num">1,284</p>
-            <div class="flex items-center gap-2 pt-2"><span class="chip num">+12%</span><span class="help">vs. last week</span></div>
+    <section aria-labelledby="preview-heading" style="min-width: 0;">
+      <h2 id="preview-heading" class="sr-only">Interactive component preview and token inspector</h2>
+      <div id="stage" class="stage">
+        <div class="stage-card">
+          <div class="stage-top">
+            <div>
+              <p class="eyebrow" id="pv-product" style="color: var(--stage-muted);">VibeCraft Studio</p>
+              <h3 class="stage-title" id="pv-theme-name">Linear Dark</h3>
+            </div>
+            <span class="stage-chip" id="pv-chip">WCAG AA Verified</span>
           </div>
 
-          <div class="surface p-5 grid gap-3 content-start">
-            <div class="flex items-baseline justify-between">
-              <p class="label">Batch progress</p>
-              <p class="help num" id="progress-text">34 of 50 memos</p>
-            </div>
-            <div class="track" role="progressbar" aria-label="Batch progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="34" id="progress-track"><div class="fill" id="progress-fill"></div></div>
-            <div><button type="button" class="btn btn-primary" id="run-btn">Transcribe next batch</button></div>
+          <div>
+            <p class="stage-label" id="pv-metric-label">Active pipeline throughput</p>
+            <p class="stage-kpi" id="pv-metric-value">99.98%</p>
           </div>
 
-          <div class="surface p-5 grid gap-4 content-start">
-            <div class="field">
-              <label class="label" for="project-name">Project name</label>
-              <input class="input" id="project-name" type="text" value="Field recordings" autocomplete="off">
-              <p class="help">Memos are grouped under this name.</p>
+          <div>
+            <div class="stage-progress-track" role="progressbar" aria-labelledby="pv-batch-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="76" id="pv-progress">
+              <div class="stage-progress-fill" id="pv-progress-fill" style="width: 76%;"></div>
             </div>
-            <div class="field">
-              <label class="label" for="project-error">Existing project</label>
-              <input class="input" id="project-error" type="text" value="Studio sessions" aria-invalid="true" aria-describedby="project-error-msg" autocomplete="off">
-              <p class="error" id="project-error-msg" role="alert">Studio sessions already exists. Pick a different name.</p>
-            </div>
+            <p class="stage-label" id="pv-batch-label" style="margin-block-start: 6px; margin-block-end: 0;">Release verification gate · 76%</p>
           </div>
 
-          <div class="surface p-5 grid gap-4 content-start">
-            <p class="label">Grouping</p>
-            <div class="dd" id="dd">
-              <button type="button" class="btn btn-secondary" id="dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="dd-list">
-                <span id="dd-label">Group by project</span>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5l4 4 4-4"/></svg>
+          <div class="stage-controls">
+            <div>
+              <label class="stage-label" for="pv-input" id="pv-field-label">Workspace slug</label>
+              <input id="pv-input" class="stage-input" type="text" value="acme-core">
+            </div>
+            <div class="dd-wrap">
+              <span class="stage-label" id="pv-dd-label">Deployment region</span>
+              <button type="button" id="dd-btn" class="dd-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="pv-dd-label dd-btn-text">
+                <span id="dd-btn-text">us-east-1 (Virginia)</span>
+                <span aria-hidden="true">▾</span>
               </button>
-              <ul class="dd-list" id="dd-list" role="listbox" tabindex="-1" aria-label="Grouping"></ul>
+              <ul id="dd-list" class="dd-menu" role="listbox" aria-labelledby="pv-dd-label" hidden></ul>
             </div>
-            <div class="flex flex-wrap gap-3">
-              <button type="button" class="btn btn-secondary">Export audio</button>
-              <button type="button" class="btn btn-primary" disabled>Share transcript</button>
-            </div>
-            <p class="help">Share is disabled until a transcript finishes.</p>
+          </div>
+
+          <div class="stage-actions">
+            <button type="button" class="stage-btn-primary" id="pv-primary-cta">Deploy release</button>
+            <button type="button" class="stage-btn-secondary" id="pv-secondary-cta">Inspect diff</button>
+            <button type="button" class="stage-btn-secondary" id="pv-disabled-cta" disabled>Locked</button>
           </div>
         </div>
-      </section>
+      </div>
 
-      <section class="surface p-5 md:p-8" aria-labelledby="tokens-title">
-        <h2 id="tokens-title" class="mb-4">Token sheet</h2>
-        <div id="token-sheet"></div>
-      </section>
+      <div id="contrast-strip" class="contrast-strip" aria-label="Live WCAG 2.2 contrast ratios"></div>
+      <div id="token-grid" class="token-grid"></div>
 
-      <section class="flex flex-wrap items-center gap-4">
-        <button type="button" class="btn btn-primary" id="lock-btn">Lock in Linear Dark &amp; Continue</button>
-        <p class="toast" id="toast" role="status" aria-live="polite"></p>
-      </section>
-      <textarea id="fallback" class="input" rows="8" readonly hidden aria-label="Locked tokens (copy manually)" style="height:auto"></textarea>
-    </div>
+      <div id="fallback-wrap" class="fallback-wrap no-print" hidden>
+        <label for="fallback" class="muted mono">Manual copy fallback (Ctrl/Cmd+C):</label>
+        <textarea id="fallback" class="fallback-box" readonly></textarea>
+      </div>
+    </section>
   </main>
+
+  <footer class="footer-bar">
+    <span id="live-status" role="status" aria-live="polite">Ready. Select an archetype or customize color swatches.</span>
+    <span class="mono">VIBECRAFT LOCK v2 · 19 tokens</span>
+  </footer>
 </div>
 
 <script>
+// @vibecraft-data:start
 // @tokens:start
+const PREVIEW = {
+  defaultTheme: 'linear',
+  productLabel: 'Live preview · HookDrain telemetry',
+  metricLabel: 'Events deduplicated (24h)',
+  metricValue: '128,490',
+  progressPct: 82,
+  batchLabel: '41 of 50 R2 archive partitions synced',
+  fieldLabel: 'Endpoint namespace',
+  fieldValue: 'prod-billing-webhooks',
+  dropdownLabel: 'Retention policy',
+  dropdownOptions: ['90 days · R2 NDJSON', '30 days · Hot D1 only', '365 days · Compliance lock'],
+  primaryCta: 'Deploy route',
+  secondaryCta: 'Replay sample',
+  disabledCta: 'Purge archive'
+};
+
 const THEMES = {
   linear: {
     name: 'Linear Dark',
-    tagline: 'Deep zinc, indigo accent, hairline borders.',
-    'bg-primary': '#09090b', 'bg-surface': '#18181b', 'bg-raised': '#27272a',
-    'fg-primary': '#ededef', 'fg-muted': '#9a9aa5',
-    'border': 'rgba(255, 255, 255, 0.08)',
-    'accent': '#5e6ad2', 'accent-2': '#22d3ee', 'accent-fg': '#fafafa',
-    'success': '#4ade80', 'danger': '#f87171',
-    'radius': '8px', 'radius-btn': '8px',
-    'font-sans': '"Geist", "Inter", ui-sans-serif, system-ui, sans-serif',
-    'font-display': '"Geist", "Inter", ui-sans-serif, system-ui, sans-serif',
-    'font-mono': '"Geist Mono", ui-monospace, "SF Mono", Menlo, monospace',
-    'shadow-overlay': '0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3)',
-    'blur': '0px', 'shape-opacity': '0'
-  },
-  editorial: {
-    name: 'Editorial Warmth',
-    tagline: 'Parchment, charcoal type, terracotta and forest.',
-    'bg-primary': '#fbfbfa', 'bg-surface': '#f4f1ea', 'bg-raised': '#ebe6da',
-    'fg-primary': '#1f1d1a', 'fg-muted': '#6b6459',
-    'border': 'rgba(31, 29, 26, 0.14)',
-    'accent': '#b4532a', 'accent-2': '#2f6b4f', 'accent-fg': '#fbfbfa',
-    'success': '#2f6b4f', 'danger': '#a33a2b',
-    'radius': '4px', 'radius-btn': '4px',
-    'font-sans': '"Inter", ui-sans-serif, system-ui, sans-serif',
-    'font-display': '"Source Serif 4", "Iowan Old Style", Georgia, serif',
-    'font-mono': '"JetBrains Mono", ui-monospace, Menlo, monospace',
-    'shadow-overlay': '0 8px 20px rgba(31, 29, 26, 0.14), 0 2px 4px rgba(31, 29, 26, 0.08)',
-    'blur': '0px', 'shape-opacity': '0'
-  },
-  brutalist: {
-    name: 'Cyber Brutalist',
-    tagline: 'Stark contrast, canary punch, square corners, mono type.',
-    'bg-primary': '#0c0c0c', 'bg-surface': '#141414', 'bg-raised': '#1f1f1f',
-    'fg-primary': '#f5f5f5', 'fg-muted': '#a3a3a3',
-    'border': 'rgba(245, 245, 245, 0.9)',
-    'accent': '#facc15', 'accent-2': '#f5f5f5', 'accent-fg': '#0c0c0c',
-    'success': '#a3e635', 'danger': '#fb7185',
-    'radius': '0px', 'radius-btn': '0px',
-    'font-sans': '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace',
-    'font-display': '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace',
-    'font-mono': '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace',
-    'shadow-overlay': '0 0 0 1px rgba(245, 245, 245, 0.9)',
-    'blur': '0px', 'shape-opacity': '0'
+    scheme: 'dark',
+    tagline: 'Deep obsidian zinc, crisp periwinkle accent, 1px hairline borders.',
+    'bg-primary': '#0b0c0e', 'bg-surface': '#121417', 'bg-raised': '#191c21',
+    'fg-primary': '#f4f5f8', 'fg-muted': '#8c93a3',
+    border: 'rgba(244, 245, 248, 0.09)',
+    accent: '#6e7bf2', 'accent-2': '#38bdf8', 'accent-fg': '#0b0c0e',
+    success: '#3dd68c', danger: '#ff7373',
+    radius: '8px', 'radius-btn': '6px',
+    'font-sans': '-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif',
+    'font-display': '-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif',
+    'font-mono': 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    'shadow-overlay': '0 8px 24px rgba(0, 0, 0, 0.42)',
+    blur: '0px', 'shape-opacity': '0'
   },
   apple: {
     name: 'Apple Clean',
-    tagline: 'Translucent glass, neutral grays, SF blue, pill buttons.',
-    'bg-primary': '#f5f5f7', 'bg-surface': 'rgba(255, 255, 255, 0.72)', 'bg-raised': 'rgba(255, 255, 255, 0.92)',
-    'fg-primary': '#1d1d1f', 'fg-muted': '#6e6e73',
-    'border': 'rgba(0, 0, 0, 0.08)',
-    'accent': '#0071e3', 'accent-2': '#34c759', 'accent-fg': '#ffffff',
-    'success': '#248a3d', 'danger': '#d70015',
-    'radius': '14px', 'radius-btn': '9999px',
-    'font-sans': '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif',
-    'font-display': '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif',
+    scheme: 'light',
+    tagline: 'Soft alabaster surfaces, SF system blue, pill controls, subtle elevation.',
+    'bg-primary': '#f5f5f7', 'bg-surface': '#fafafa', 'bg-raised': '#ebebf0',
+    'fg-primary': '#1d1d1f', 'fg-muted': '#54545a',
+    border: 'rgba(29, 29, 31, 0.12)',
+    accent: '#005bb8', 'accent-2': '#146c2e', 'accent-fg': '#fafafa',
+    success: '#146c2e', danger: '#b82018',
+    radius: '14px', 'radius-btn': '9999px',
+    'font-sans': '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif',
+    'font-display': '-apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif',
     'font-mono': 'ui-monospace, "SF Mono", Menlo, monospace',
-    'shadow-overlay': '0 12px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06)',
-    'blur': '20px', 'shape-opacity': '0.28'
+    'shadow-overlay': '0 10px 28px rgba(29, 29, 31, 0.10)',
+    blur: '16px', 'shape-opacity': '0'
+  },
+  editorial: {
+    name: 'Editorial Warmth',
+    scheme: 'light',
+    tagline: 'Warm rag paper, literary serif display, terracotta ink, crisp rules.',
+    'bg-primary': '#faf6f0', 'bg-surface': '#f4efe6', 'bg-raised': '#e8e0d3',
+    'fg-primary': '#1c1917', 'fg-muted': '#575049',
+    border: 'rgba(28, 25, 23, 0.15)',
+    accent: '#a33010', 'accent-2': '#186636', 'accent-fg': '#faf6f0',
+    success: '#186636', danger: '#a61d14',
+    radius: '4px', 'radius-btn': '4px',
+    'font-sans': '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+    'font-display': '"Iowan Old Style", "Palatino Linotype", Georgia, serif',
+    'font-mono': 'ui-monospace, "SF Mono", Menlo, monospace',
+    'shadow-overlay': '0 8px 20px rgba(28, 25, 23, 0.12)',
+    blur: '0px', 'shape-opacity': '0'
+  },
+  brutalist: {
+    name: 'Cyber Brutalist',
+    scheme: 'dark',
+    tagline: 'Stark carbon surfaces, electric volt punch, zero radius, tabular mono.',
+    'bg-primary': '#0c0c0c', 'bg-surface': '#141414', 'bg-raised': '#1e1e1e',
+    'fg-primary': '#f2f2ee', 'fg-muted': '#9e9e96',
+    border: 'rgba(242, 242, 238, 0.82)',
+    accent: '#d4ff33', 'accent-2': '#f2f2ee', 'accent-fg': '#0c0c0c',
+    success: '#4ade80', danger: '#fb7185',
+    radius: '0px', 'radius-btn': '0px',
+    'font-sans': 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    'font-display': 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    'font-mono': 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    'shadow-overlay': '0 0 0 1px rgba(242, 242, 238, 0.82)',
+    blur: '0px', 'shape-opacity': '0'
+  },
+  swiss: {
+    name: 'Swiss Grid',
+    scheme: 'light',
+    tagline: 'Archival warm grey, neo-grotesque hierarchy, signal vermilion, 2px grid.',
+    'bg-primary': '#f4f4f0', 'bg-surface': '#fbfbf9', 'bg-raised': '#e6e6df',
+    'fg-primary': '#141413', 'fg-muted': '#50504b',
+    border: 'rgba(20, 20, 19, 0.16)',
+    accent: '#bd2419', 'accent-2': '#14692e', 'accent-fg': '#fbfbf9',
+    success: '#14692e', danger: '#b01c12',
+    radius: '2px', 'radius-btn': '2px',
+    'font-sans': '"Helvetica Neue", -apple-system, Arial, system-ui, sans-serif',
+    'font-display': '"Helvetica Neue", -apple-system, Arial, system-ui, sans-serif',
+    'font-mono': 'ui-monospace, "SF Mono", Menlo, monospace',
+    'shadow-overlay': '0 6px 18px rgba(20, 20, 19, 0.09)',
+    blur: '0px', 'shape-opacity': '0'
+  },
+  nocturne: {
+    name: 'Nocturne Terminal',
+    scheme: 'dark',
+    tagline: 'Deep mineral slate, phosphor emerald signal, high-legibility console.',
+    'bg-primary': '#080c0a', 'bg-surface': '#0f1613', 'bg-raised': '#16201c',
+    'fg-primary': '#e6f2ed', 'fg-muted': '#88a096',
+    border: 'rgba(230, 242, 237, 0.12)',
+    accent: '#34d399', 'accent-2': '#38bdf8', 'accent-fg': '#07130e',
+    success: '#4ade80', danger: '#f87171',
+    radius: '6px', 'radius-btn': '4px',
+    'font-sans': '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+    'font-display': 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    'font-mono': 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    'shadow-overlay': '0 10px 26px rgba(0, 0, 0, 0.48)',
+    blur: '0px', 'shape-opacity': '0'
   }
 };
 // @tokens:end
+// @vibecraft-data:end
 
-const TOKEN_KEYS = ['bg-primary', 'bg-surface', 'bg-raised', 'fg-primary', 'fg-muted', 'border', 'accent', 'accent-2', 'accent-fg', 'success', 'danger', 'radius', 'radius-btn', 'font-sans', 'font-display', 'font-mono', 'shadow-overlay', 'blur', 'shape-opacity'];
-const SWATCH_KEYS = ['bg-primary', 'bg-raised', 'accent', 'accent-2'];
-const COLOR_KEYS = new Set(['bg-primary', 'bg-surface', 'bg-raised', 'fg-primary', 'fg-muted', 'border', 'accent', 'accent-2', 'accent-fg', 'success', 'danger']);
+const $ = (id) => document.getElementById(id);
+let flashTimer = 0;
 
-const root = document.documentElement;
-const el = (id) => document.getElementById(id);
-let current = 'linear';
-let resetTimer = 0;
-
-function buildCards() {
-  const host = el('cards');
-  Object.entries(THEMES).forEach(([key, theme]) => {
-    const label = document.createElement('label');
-    label.className = 'card';
-
-    const input = document.createElement('input');
-    input.type = 'radio';
-    input.name = 'archetype';
-    input.value = key;
-    input.className = 'sr-only';
-    input.checked = key === current;
-    input.addEventListener('change', () => applyTheme(key));
-
-    const swatches = document.createElement('span');
-    swatches.className = 'swatches';
-    SWATCH_KEYS.forEach((k) => {
-      const s = document.createElement('span');
-      s.className = 'swatch';
-      s.style.backgroundColor = theme[k];
-      swatches.appendChild(s);
-    });
-
-    const name = document.createElement('span');
-    name.className = 'card-name';
-    name.textContent = theme.name;
-    name.style.fontFamily = theme['font-display'];
-
-    const tag = document.createElement('span');
-    tag.className = 'card-tag';
-    tag.textContent = theme.tagline;
-
-    label.append(input, swatches, name, tag);
-    host.appendChild(label);
-  });
+function announceStatus(msg, btn, doneLabel) {
+  const statusEl = $('live-status');
+  if (statusEl) statusEl.textContent = msg;
+  if (btn && doneLabel) {
+    if (!btn.dataset.origLabel) btn.dataset.origLabel = btn.textContent;
+    btn.textContent = doneLabel;
+    window.clearTimeout(flashTimer);
+    flashTimer = window.setTimeout(() => {
+      btn.textContent = btn.dataset.origLabel;
+    }, 1600);
+  }
 }
 
-function renderTokenSheet(theme) {
-  const host = el('token-sheet');
-  host.textContent = '';
-  TOKEN_KEYS.forEach((k) => {
-    const row = document.createElement('div');
-    row.className = 'token-row';
-    const chip = document.createElement('span');
-    chip.className = 'token-chip';
-    if (COLOR_KEYS.has(k)) chip.style.backgroundColor = theme[k];
-    const name = document.createElement('span');
-    name.className = 'mono';
-    name.textContent = '--' + k;
-    const value = document.createElement('span');
-    value.className = 'mono help';
-    value.textContent = theme[k];
-    row.append(chip, name, value);
-    host.appendChild(row);
-  });
-}
-
-function applyTheme(key) {
-  const theme = THEMES[key];
-  current = key;
-  TOKEN_KEYS.forEach((k) => root.style.setProperty('--' + k, theme[k]));
-  el('active-pill').textContent = 'Active: ' + theme.name;
-  el('lock-btn').textContent = 'Lock in ' + theme.name + ' & Continue';
-  el('toast').textContent = '';
-  el('fallback').hidden = true;
-  renderTokenSheet(theme);
-}
-
-function lockText() {
-  const theme = THEMES[current];
-  const lines = TOKEN_KEYS.map((k) => '  --' + k + ': ' + theme[k] + ';');
-  return [
-    'VIBECRAFT LOCK · Phase 2 · Brand Artisan',
-    'Archetype: ' + theme.name,
-    '',
-    ':root {',
-    ...lines,
-    '}',
-    '',
-    'Rules: Craft 12 enforced, tokens only, no hardcoded colors in components.',
-    'Continue: start Phase 3 (System Architect).'
-  ].join('\n');
-}
-
-function legacyCopy(text) {
-  const area = document.createElement('textarea');
-  area.value = text;
-  area.setAttribute('readonly', '');
-  area.style.position = 'fixed';
-  area.style.opacity = '0';
-  document.body.appendChild(area);
-  area.select();
-  let ok = false;
-  try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
-  area.remove();
-  return ok;
-}
-
-async function copyText(text) {
+async function copyWithFallback(text, btn, doneLabel) {
+  const fbWrap = $('fallback-wrap');
+  const fb = $('fallback');
   try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (error) {
-    return legacyCopy(text);
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      if (fbWrap) fbWrap.hidden = true;
+      announceStatus('Copied to clipboard.', btn, doneLabel || 'Copied ✓');
+      return;
+    }
+    throw new Error('Clipboard API unavailable');
+  } catch (_err) {
+    if (fb && fbWrap) {
+      fbWrap.hidden = false;
+      fb.value = text;
+      fb.focus();
+      fb.select();
+    }
+    announceStatus('Clipboard blocked by sandbox; select and copy from the text box below.', btn, 'Select below');
   }
 }
 
-async function lockIn() {
-  const text = lockText();
-  const ok = await copyText(text);
-  const toast = el('toast');
-  const fallback = el('fallback');
-  if (ok) {
-    toast.textContent = 'Copied. Paste it into the chat to start Phase 3.';
-    fallback.hidden = true;
-  } else {
-    toast.textContent = 'Clipboard is blocked here. Copy the selected text below.';
-    fallback.value = text;
-    fallback.hidden = false;
-    fallback.focus();
-    fallback.select();
+function downloadBlob(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType || 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  announceStatus('Downloaded ' + filename + '.');
+}
+
+const TOKEN_KEYS = [
+  'bg-primary', 'bg-surface', 'bg-raised', 'fg-primary', 'fg-muted',
+  'border', 'accent', 'accent-2', 'accent-fg', 'success', 'danger',
+  'radius', 'radius-btn', 'font-sans', 'font-display', 'font-mono',
+  'shadow-overlay', 'blur', 'shape-opacity'
+];
+const HEX_EDITABLE = new Set(['bg-primary', 'bg-surface', 'bg-raised', 'fg-primary', 'fg-muted', 'accent', 'accent-2', 'accent-fg', 'success', 'danger']);
+
+const themeKeys = THEMES && typeof THEMES === 'object' ? Object.keys(THEMES) : [];
+let currentKey = (PREVIEW && PREVIEW.defaultTheme && THEMES[PREVIEW.defaultTheme])
+  ? PREVIEW.defaultTheme
+  : (themeKeys[0] || '');
+let ddIndex = 0;
+
+function parseRgba(str) {
+  const s = String(str || '').trim();
+  if (s.startsWith('#')) {
+    const h = s.slice(1);
+    if (h.length === 3) return [parseInt(h[0]+h[0],16), parseInt(h[1]+h[1],16), parseInt(h[2]+h[2],16), 1];
+    if (h.length >= 6) return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16), 1];
   }
-  window.clearTimeout(resetTimer);
-  resetTimer = window.setTimeout(() => { if (ok) toast.textContent = ''; }, 4000);
+  const m = s.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/);
+  if (m) return [+m[1], +m[2], +m[3], m[4] !== undefined ? +m[4] : 1];
+  return [128, 128, 128, 1];
 }
 
-const progress = { done: 34, total: 50 };
-function renderProgress() {
-  el('progress-fill').style.setProperty('--progress', String(progress.done / progress.total));
-  el('progress-track').setAttribute('aria-valuenow', String(progress.done));
-  el('progress-text').textContent = progress.done + ' of ' + progress.total + ' memos';
-  el('run-btn').textContent = progress.done >= progress.total ? 'Start a new batch' : 'Transcribe next batch';
+function composite(fg, bg) {
+  const a = fg[3];
+  return [fg[0]*a + bg[0]*(1-a), fg[1]*a + bg[1]*(1-a), fg[2]*a + bg[2]*(1-a), 1];
 }
 
-function runBatch() {
-  const btn = el('run-btn');
-  if (progress.done >= progress.total) {
-    progress.done = 6;
-    renderProgress();
-    return;
-  }
-  btn.disabled = true;
-  btn.dataset.loading = 'true';
-  btn.textContent = 'Transcribing';
-  window.setTimeout(() => {
-    progress.done = Math.min(progress.total, progress.done + 8);
-    btn.disabled = false;
-    delete btn.dataset.loading;
-    renderProgress();
-  }, 1200);
+function lum(c) {
+  const f = (v) => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); };
+  return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
 }
 
-function initDropdown() {
-  const options = ['Group by project', 'Group by date', 'Group by speaker'];
-  const wrap = el('dd');
-  const btn = el('dd-btn');
-  const list = el('dd-list');
-  let active = 0;
-  let selected = 0;
+function wcagRatio(a, b) {
+  const l1 = lum(a), l2 = lum(b);
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+}
 
-  options.forEach((text, i) => {
+function cssRootText() {
+  const t = THEMES[currentKey];
+  if (!t) return ':root {}\n';
+  return [':root {', ...TOKEN_KEYS.map((k) => '  --' + k + ': ' + t[k] + ';'), '}'].join('\n') + '\n';
+}
+
+function lockBlockText() {
+  const t = THEMES[currentKey];
+  if (!t) return 'VIBECRAFT LOCK v2 · Phase 2 · Brand Artisan\nError: No theme loaded.';
+  const lines = [
+    'VIBECRAFT LOCK v2 · Phase 2 · Brand Artisan',
+    'Archetype: ' + (t.name || currentKey),
+    'ThemeId: ' + currentKey
+  ];
+  if (t.scheme) lines.push('Scheme: ' + t.scheme);
+  lines.push('', cssRootText().trimEnd());
+  return lines.join('\n');
+}
+
+function applyPreviewCopy() {
+  const p = PREVIEW && typeof PREVIEW === 'object' ? PREVIEW : {};
+  $('pv-product').textContent = p.productLabel || 'Live preview';
+  $('pv-metric-label').textContent = p.metricLabel || 'Primary metric';
+  $('pv-metric-value').textContent = p.metricValue || '1,024';
+  const pct = Math.max(0, Math.min(100, Number(p.progressPct) || 72));
+  $('pv-progress').setAttribute('aria-valuenow', String(pct));
+  $('pv-progress-fill').style.width = pct + '%';
+  $('pv-batch-label').textContent = p.batchLabel || pct + '% complete';
+  $('pv-field-label').textContent = p.fieldLabel || 'Workspace';
+  $('pv-input').value = p.fieldValue || 'production';
+  $('pv-dd-label').textContent = p.dropdownLabel || 'Profile';
+  $('pv-primary-cta').textContent = p.primaryCta || 'Save changes';
+  $('pv-secondary-cta').textContent = p.secondaryCta || 'Preview';
+  $('pv-disabled-cta').textContent = p.disabledCta || 'Archive';
+
+  const opts = Array.isArray(p.dropdownOptions) && p.dropdownOptions.length > 0
+    ? p.dropdownOptions
+    : ['Standard profile', 'Strict mode', 'Read-only'];
+  const list = $('dd-list');
+  list.replaceChildren();
+  opts.forEach((optText, idx) => {
     const li = document.createElement('li');
-    li.className = 'dd-item';
+    li.className = 'dd-option';
     li.setAttribute('role', 'option');
-    li.id = 'dd-opt-' + i;
-    li.textContent = text;
-    li.setAttribute('aria-selected', String(i === selected));
-    li.addEventListener('click', () => choose(i));
+    li.id = 'dd-opt-' + idx;
+    li.tabIndex = -1;
+    li.setAttribute('aria-selected', idx === ddIndex ? 'true' : 'false');
+    li.textContent = optText;
+    li.addEventListener('click', () => selectDropdownIndex(idx, true));
+    li.addEventListener('keydown', (ev) => onOptionKeydown(ev, idx, opts.length));
     list.appendChild(li);
   });
-
-  function setActive(i) {
-    active = (i + options.length) % options.length;
-    [...list.children].forEach((li, n) => li.classList.toggle('active', n === active));
-    list.setAttribute('aria-activedescendant', 'dd-opt-' + active);
-  }
-  function open() {
-    wrap.classList.add('open');
-    btn.setAttribute('aria-expanded', 'true');
-    setActive(selected);
-    list.focus();
-  }
-  function close(returnFocus) {
-    wrap.classList.remove('open');
-    btn.setAttribute('aria-expanded', 'false');
-    if (returnFocus) btn.focus();
-  }
-  function choose(i) {
-    selected = i;
-    el('dd-label').textContent = options[i];
-    [...list.children].forEach((li, n) => li.setAttribute('aria-selected', String(n === i)));
-    close(true);
-  }
-
-  btn.addEventListener('click', () => (wrap.classList.contains('open') ? close(false) : open()));
-  list.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowDown') { event.preventDefault(); setActive(active + 1); }
-    else if (event.key === 'ArrowUp') { event.preventDefault(); setActive(active - 1); }
-    else if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choose(active); }
-    else if (event.key === 'Escape' || event.key === 'Tab') { close(event.key === 'Escape'); }
-  });
-  document.addEventListener('click', (event) => { if (!wrap.contains(event.target)) close(false); });
+  $('dd-btn-text').textContent = opts[ddIndex] || opts[0];
 }
 
-buildCards();
-applyTheme(current);
-renderProgress();
-initDropdown();
-el('run-btn').addEventListener('click', runBatch);
-el('lock-btn').addEventListener('click', lockIn);
+function openDropdown(focusIdx) {
+  const list = $('dd-list');
+  const btn = $('dd-btn');
+  list.hidden = false;
+  btn.setAttribute('aria-expanded', 'true');
+  const items = list.querySelectorAll('[role="option"]');
+  const target = items[Math.max(0, Math.min(items.length - 1, focusIdx))];
+  if (target) target.focus();
+}
+
+function closeDropdown(returnFocus) {
+  $('dd-list').hidden = true;
+  $('dd-btn').setAttribute('aria-expanded', 'false');
+  if (returnFocus) $('dd-btn').focus();
+}
+
+function selectDropdownIndex(idx, closeAfter) {
+  const items = $('dd-list').querySelectorAll('[role="option"]');
+  if (items.length === 0) return;
+  ddIndex = (idx + items.length) % items.length;
+  items.forEach((el, i) => el.setAttribute('aria-selected', i === ddIndex ? 'true' : 'false'));
+  $('dd-btn-text').textContent = items[ddIndex].textContent;
+  if (closeAfter) closeDropdown(true);
+}
+
+function onOptionKeydown(ev, idx, total) {
+  if (ev.key === 'Escape') {
+    ev.preventDefault();
+    closeDropdown(true);
+  } else if (ev.key === 'ArrowDown') {
+    ev.preventDefault();
+    openDropdown((idx + 1) % total);
+  } else if (ev.key === 'ArrowUp') {
+    ev.preventDefault();
+    openDropdown((idx - 1 + total) % total);
+  } else if (ev.key === 'Home') {
+    ev.preventDefault();
+    openDropdown(0);
+  } else if (ev.key === 'End') {
+    ev.preventDefault();
+    openDropdown(total - 1);
+  } else if (ev.key === 'Enter' || ev.key === ' ') {
+    ev.preventDefault();
+    selectDropdownIndex(idx, true);
+  }
+}
+
+$('dd-btn').addEventListener('click', () => {
+  const isOpen = !$('dd-list').hidden;
+  if (isOpen) closeDropdown(false);
+  else openDropdown(ddIndex);
+});
+
+// Handle ArrowDown / ArrowUp when closed (A11Y-04)
+$('dd-btn').addEventListener('keydown', (ev) => {
+  if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+    ev.preventDefault();
+    const items = $('dd-list').querySelectorAll('[role="option"]');
+    if (items.length === 0) return;
+    const next = ev.key === 'ArrowDown' ? ddIndex : (ddIndex - 1 + items.length) % items.length;
+    openDropdown(next);
+  }
+});
+
+document.addEventListener('click', (ev) => {
+  if (!$('dd-list').hidden && !ev.target.closest('.dd-wrap')) {
+    closeDropdown(false);
+  }
+});
+
+function renderStageAndTokens() {
+  const keys = THEMES && typeof THEMES === 'object' ? Object.keys(THEMES) : [];
+  const presetList = $('preset-list');
+  presetList.replaceChildren();
+
+  if (keys.length === 0) {
+    $('stage').replaceChildren();
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'No theme presets found in THEMES.';
+    $('stage').appendChild(empty);
+    $('lock-btn').disabled = true;
+    $('download-css-btn').disabled = true;
+    return;
+  }
+
+  const t = THEMES[currentKey] || THEMES[keys[0]];
+  keys.forEach((k, idx) => {
+    const item = THEMES[k];
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'preset-btn';
+    btn.setAttribute('role', 'radio');
+    btn.setAttribute('aria-checked', k === currentKey ? 'true' : 'false');
+    btn.tabIndex = k === currentKey ? 0 : -1;
+
+    const head = document.createElement('div');
+    head.className = 'preset-head';
+    const nameSpan = document.createElement('span');
+    nameSpan.style.fontWeight = '600';
+    nameSpan.textContent = item.name || k;
+    head.appendChild(nameSpan);
+
+    const dots = document.createElement('span');
+    dots.className = 'swatches';
+    ['bg-primary', 'accent', 'success'].forEach((sk) => {
+      const d = document.createElement('span');
+      d.className = 'swatch-dot';
+      d.style.background = item[sk];
+      dots.appendChild(d);
+    });
+    head.appendChild(dots);
+    btn.appendChild(head);
+
+    const desc = document.createElement('span');
+    desc.className = 'muted';
+    desc.style.fontSize = '0.78rem';
+    desc.textContent = item.tagline || '';
+    btn.appendChild(desc);
+
+    btn.addEventListener('click', () => {
+      currentKey = k;
+      renderStageAndTokens();
+    });
+    btn.addEventListener('keydown', (ev) => {
+      if (['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'].includes(ev.key)) {
+        ev.preventDefault();
+        const dir = ev.key === 'ArrowDown' || ev.key === 'ArrowRight' ? 1 : -1;
+        currentKey = keys[(idx + dir + keys.length) % keys.length];
+        renderStageAndTokens();
+        const active = presetList.querySelector('[aria-checked="true"]');
+        if (active) active.focus();
+      }
+    });
+    presetList.appendChild(btn);
+  });
+
+  const stage = $('stage');
+  const okRgb = parseRgba(t.success);
+  stage.style.setProperty('--stage-bg', t['bg-primary']);
+  stage.style.setProperty('--stage-surface', t['bg-surface']);
+  stage.style.setProperty('--stage-raised', t['bg-raised']);
+  stage.style.setProperty('--stage-fg', t['fg-primary']);
+  stage.style.setProperty('--stage-muted', t['fg-muted']);
+  stage.style.setProperty('--stage-border', t.border);
+  stage.style.setProperty('--stage-accent', t.accent);
+  stage.style.setProperty('--stage-accent-2', t['accent-2']);
+  stage.style.setProperty('--stage-accent-fg', t['accent-fg']);
+  stage.style.setProperty('--stage-success', t.success);
+  stage.style.setProperty('--stage-chip-bg', 'color-mix(in srgb, ' + t.success + ' 12%, transparent)');
+  stage.style.setProperty('--stage-radius', t.radius);
+  stage.style.setProperty('--stage-radius-btn', t['radius-btn']);
+  stage.style.setProperty('--stage-shadow', t['shadow-overlay']);
+  stage.style.setProperty('--stage-font-sans', t['font-sans']);
+  stage.style.setProperty('--stage-font-display', t['font-display']);
+  stage.style.setProperty('--stage-font-mono', t['font-mono']);
+  $('pv-theme-name').textContent = t.name || currentKey;
+
+  // Live WCAG 2.2 AA contrast readout
+  const bgC = parseRgba(t['bg-primary']);
+  const surfRaw = parseRgba(t['bg-surface']);
+  const surfC = surfRaw[3] < 1 ? composite(surfRaw, bgC) : surfRaw;
+  const fgC = parseRgba(t['fg-primary']);
+  const mutC = parseRgba(t['fg-muted']);
+  const accC = parseRgba(t.accent);
+  const accFgC = parseRgba(t['accent-fg']);
+  const chipBgC = composite([okRgb[0], okRgb[1], okRgb[2], 0.12], surfC);
+
+  const pairs = [
+    ['Body / Surface', wcagRatio(fgC, surfC), 4.5],
+    ['Muted / Surface', wcagRatio(mutC, surfC), 4.5],
+    ['CTA Text / Accent', wcagRatio(accFgC, accC), 4.5],
+    ['Status Chip', wcagRatio(okRgb, chipBgC), 4.5]
+  ];
+  const strip = $('contrast-strip');
+  strip.replaceChildren();
+  const allPass = pairs.every((p) => p[1] >= p[2]);
+  $('pv-chip').textContent = allPass ? 'WCAG AA Pass' : 'Contrast Warning';
+
+  pairs.forEach(([label, ratio, min]) => {
+    const pass = ratio >= min;
+    const badge = document.createElement('span');
+    badge.className = pass ? 'tag tag-verified' : 'tag tag-danger';
+    badge.textContent = label + ': ' + ratio.toFixed(2) + ':1 ' + (pass ? '✓' : '(<' + min + ')');
+    strip.appendChild(badge);
+  });
+
+  // Token inspector cells with live color inputs
+  const grid = $('token-grid');
+  grid.replaceChildren();
+  TOKEN_KEYS.forEach((tk) => {
+    const cell = document.createElement('div');
+    cell.className = 'token-cell';
+    const meta = document.createElement('div');
+    meta.style.minWidth = '0';
+    const keyEl = document.createElement('div');
+    keyEl.className = 'mono';
+    keyEl.textContent = '--' + tk;
+    const valEl = document.createElement('div');
+    valEl.className = 'muted mono';
+    valEl.style.fontSize = '0.72rem';
+    valEl.style.overflow = 'hidden';
+    valEl.style.textOverflow = 'ellipsis';
+    valEl.style.whiteSpace = 'nowrap';
+    valEl.textContent = t[tk];
+    meta.appendChild(keyEl);
+    meta.appendChild(valEl);
+    cell.appendChild(meta);
+
+    if (HEX_EDITABLE.has(tk) && /^#[0-9a-fA-F]{6}$/.test(String(t[tk]).trim())) {
+      const inp = document.createElement('input');
+      inp.type = 'color';
+      inp.className = 'color-picker no-print';
+      inp.value = String(t[tk]).trim();
+      inp.setAttribute('aria-label', 'Edit token --' + tk);
+      inp.addEventListener('input', (ev) => {
+        t[tk] = ev.target.value;
+        renderStageAndTokens();
+      });
+      cell.appendChild(inp);
+    }
+    grid.appendChild(cell);
+  });
+}
+
+$('lock-btn').addEventListener('click', () => {
+  copyWithFallback(lockBlockText(), $('lock-btn'), 'Locked & copied ✓');
+});
+
+$('download-css-btn').addEventListener('click', () => {
+  downloadBlob('tokens.css', cssRootText(), 'text/css;charset=utf-8');
+});
+
+applyPreviewCopy();
+renderStageAndTokens();
 </script>
 </body>
 </html>

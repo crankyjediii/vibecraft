@@ -69,8 +69,8 @@ Q1 · Angle: [1] Mobile offline PWA*  [2] Native iOS/Android  [3] Desktop kitche
 VIBECRAFT LOCK v2 · Phase 2 · Brand Artisan
 Archetype: Editorial (editorial)
 :root {
-  --bg: #faf6f0;
-  --surface: #f4efe6;
+  --bg-primary: #faf6f0;
+  --bg-surface: #f4efe6;
 ```
 
 ### Assistant Turn 4 (Hold Phase 2 gate; report exact missing keys)
@@ -80,7 +80,7 @@ Archetype: Editorial (editorial)
 ╰─ Phase 2/4 · Incomplete lock block · Choose 1 or re-paste
 ```
 
-Your pasted `VIBECRAFT LOCK` block is truncated after `--surface` (missing closing `}` and 17 of 19 required `TOKEN_KEYS`).
+Your pasted `VIBECRAFT LOCK` block is truncated after `--bg-surface` (missing closing `}` and 17 of 19 required `TOKEN_KEYS`).
 ```text
 Fix lock: [1] Complete missing keys from Editorial preset*  [2] Re-paste full VIBECRAFT LOCK block
 ```

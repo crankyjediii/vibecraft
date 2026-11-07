@@ -1,343 +1,685 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>VibeCraft Stack Matrix</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
-<script src="https://cdn.tailwindcss.com"></script>
+<title>VibeCraft · Phase 1 Stack Matrix</title>
 <style>
 :root {
-  --bg-primary: #09090b;
-  --bg-surface: #18181b;
-  --bg-raised: #27272a;
-  --fg-primary: #ededef;
-  --fg-muted: #9a9aa5;
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #5e6ad2;
-  --accent-fg: #fafafa;
-  --success: #4ade80;
-  --warn: #fbbf24;
-  --danger: #f87171;
-  --info: #22d3ee;
+  --bg-primary: #0b0c0e;
+  --bg-surface: #121417;
+  --bg-raised: #191c21;
+  --fg-primary: #f4f5f8;
+  --fg-muted: #8c93a3;
+  --border: rgba(244, 245, 248, 0.10);
+  --border-strong: rgba(244, 245, 248, 0.22);
+  --accent: #7c89ff;
+  --accent-fg: #0b0c0e;
+  --accent-soft: rgba(124, 137, 255, 0.12);
+  --success: #3dd68c;
+  --success-soft: rgba(61, 214, 140, 0.12);
+  --warn: #f5a623;
+  --warn-soft: rgba(245, 166, 35, 0.12);
+  --danger: #ff7373;
+  --danger-soft: rgba(255, 115, 115, 0.12);
   --radius: 8px;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --radius-sm: 6px;
+  --shadow-overlay: 0 10px 28px rgba(0, 0, 0, 0.42);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: light) {
   :root {
-    --bg-primary: #fbfbfa;
-    --bg-surface: #f4f4f1;
-    --bg-raised: #e9e9e5;
-    --fg-primary: #18181b;
-    --fg-muted: #52525b;
-    --border: rgba(24, 24, 27, 0.12);
-    --accent: #4f58b8;
-    --accent-fg: #fafafa;
-    --success: #15803d;
-    --warn: #a16207;
-    --danger: #b91c1c;
-    --info: #0e7490;
+    --bg-primary: #f6f6f4;
+    --bg-surface: #fcfcfa;
+    --bg-raised: #ebebea;
+    --fg-primary: #161618;
+    --fg-muted: #525259;
+    --border: rgba(22, 22, 24, 0.12);
+    --border-strong: rgba(22, 22, 24, 0.26);
+    --accent: #3b46b8;
+    --accent-fg: #fcfcfa;
+    --accent-soft: rgba(59, 70, 184, 0.09);
+    --success: #136c2e;
+    --success-soft: rgba(19, 108, 46, 0.10);
+    --warn: #854800;
+    --warn-soft: rgba(133, 72, 0, 0.10);
+    --danger: #b01c12;
+    --danger-soft: rgba(176, 28, 18, 0.10);
+    --shadow-overlay: 0 8px 24px rgba(22, 22, 24, 0.08);
   }
 }
-
 *, *::before, *::after { box-sizing: border-box; }
-.grid > * { min-width: 0; }
-html { color-scheme: light dark; }
-body { margin: 0; background-color: var(--bg-primary); color: var(--fg-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.55; }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-h1, h2, h3, p, ul { margin: 0; }
-body h1 { font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
-body h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
-body h3 { font-size: 20px; font-weight: 600; line-height: 1.2; }
-.mono { font-family: var(--font-mono); }
-.num { font-variant-numeric: tabular-nums; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-primary);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.shell {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-block: 24px 40px;
+  padding-inline: 16px;
+}
+@media (min-width: 768px) {
+  .shell { padding-inline: 28px; }
+}
+.eyebrow {
+  margin: 0 0 4px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+p { margin: 0; overflow-wrap: anywhere; }
 .muted { color: var(--fg-muted); }
-
-.option {
-  position: relative; isolation: isolate;
-  display: grid; gap: 20px; align-content: start; padding: 24px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border); border-radius: var(--radius);
-  cursor: pointer;
-  transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tabular { font-variant-numeric: tabular-nums; }
+.header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-end: 20px;
+  padding-block-end: 16px;
+  border-block-end: 1px solid var(--border);
 }
-.option:hover { background-color: var(--bg-raised); }
-.option:active { transform: translateY(1px); }
-.option:has(input:checked) { border-color: var(--accent); }
-.option:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
-.indicator {
-  position: absolute; top: 20px; right: 20px;
-  width: 20px; height: 20px; border-radius: 9999px;
-  border: 2px solid var(--border);
-  display: grid; place-items: center;
-  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
-.indicator::after { content: ""; width: 8px; height: 8px; border-radius: 9999px; background-color: var(--accent-fg); transform: scale(0); transition: transform 150ms ease-out; }
-.option:has(input:checked) .indicator { background-color: var(--accent); border-color: var(--accent); }
-.option:has(input:checked) .indicator::after { transform: scale(1); }
-
-.badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); color: var(--fg-muted); }
-.badge-pick { color: var(--accent-fg); background-color: var(--accent); border-color: var(--accent); }
-.tag { font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; }
-.tag-verified { color: var(--success); }
-.tag-inferred { color: var(--info); }
-.tag-gotcha { color: var(--warn); }
-
-.row { display: grid; gap: 6px; padding-top: 16px; border-top: 1px solid var(--border); }
-.row-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.row-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
-.big { font-size: 28px; font-weight: 600; line-height: 1.1; }
-.bar { height: 6px; border-radius: 9999px; background-color: var(--bg-raised); overflow: hidden; }
-.option:hover .bar { background-color: var(--bg-primary); }
-.bar-fill { height: 100%; border-radius: 9999px; background-color: var(--accent); transform-origin: left center; transform: scaleX(var(--ratio, 0)); transition: transform 250ms ease-out; }
-.dots { display: inline-flex; gap: 4px; }
-.dot { width: 10px; height: 10px; border-radius: 9999px; border: 1px solid var(--fg-muted); }
-.dot.on { background-color: var(--success); border-color: var(--success); }
-.gotcha { padding: 12px; border-radius: var(--radius); border: 1px solid var(--border); background-color: var(--bg-primary); display: grid; gap: 6px; }
-
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  height: 44px; padding: 0 20px; border-radius: var(--radius);
-  border: 1px solid transparent; background-color: var(--accent); color: var(--accent-fg);
-  font: inherit; font-weight: 600; cursor: pointer;
-  transition: background-color 150ms ease-out, transform 150ms ease-out, opacity 150ms ease-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  min-width: 38px;
+  padding-block: 8px;
+  padding-inline: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 550;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, opacity 140ms ease;
 }
-.btn:hover:not(:disabled) { background-color: color-mix(in srgb, var(--accent) 86%, var(--fg-primary)); }
-.btn:active:not(:disabled) { transform: translateY(1px); }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-ghost { background-color: transparent; color: var(--fg-primary); border-color: var(--border); }
-.btn-ghost:hover:not(:disabled) { background-color: var(--bg-raised); }
-.status { font-size: 13px; color: var(--fg-muted); min-height: 20px; }
-.fallback { width: 100%; padding: 12px; background-color: var(--bg-surface); color: var(--fg-primary); border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--font-mono); font-size: 13px; }
-
+.btn:hover:not(:disabled) {
+  background: var(--bg-raised);
+  border-color: var(--border-strong);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: transparent;
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--fg-primary);
+  opacity: 0.92;
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--fg-primary);
+  outline-offset: 2px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tag-verified { background: var(--success-soft); color: var(--success); }
+.tag-inferred { background: var(--accent-soft); color: var(--accent); }
+.tag-gotcha, .tag-warn { background: var(--warn-soft); color: var(--warn); }
+.tag-danger { background: var(--danger-soft); color: var(--danger); }
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-width: 0;
+}
+.empty-state {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  color: var(--fg-muted);
+}
+.fallback-wrap {
+  margin-block-start: 12px;
+}
+.fallback-box {
+  width: 100%;
+  min-height: 110px;
+  margin-block-start: 6px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.fallback-box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.footer-bar {
+  margin-block-start: 24px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.84rem;
+  color: var(--fg-muted);
+}
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+@media print {
+  body { background: var(--bg-surface); }
+  .no-print { display: none !important; }
+  .shell { max-width: 100%; padding: 0; }
+  .panel { break-inside: avoid; }
+}
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 860px) {
+  .cards-grid { grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+}
+.option-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  text-align: start;
+  min-width: 0;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+.option-card:hover {
+  border-color: var(--border-strong);
+}
+.option-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.option-card[aria-checked="true"] {
+  border-color: var(--accent);
+  background: var(--bg-raised);
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.stack-line {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+.metric-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-block: 10px;
+  border-block: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.metric-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.bar-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.gotcha-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.83rem;
+}
+.gotcha-box {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
 }
 </style>
 </head>
 <body>
-<div class="min-h-screen px-4 py-6 md:px-8 md:py-10">
-  <header class="grid gap-3 pb-8 max-w-3xl">
-    <h2>Phase 1 of 4 · Research Scout</h2>
-    <h1 id="headline"></h1>
-    <p class="muted" id="subline"></p>
+<div class="shell">
+  <header class="header-row">
+    <div>
+      <p class="eyebrow">Phase 1 of 4 · Research Scout</p>
+      <h1>Choose a software stack</h1>
+      <p class="muted" id="subtitle">Select a candidate stack, inspect its gotchas, and copy your lock block for Claude.</p>
+    </div>
+    <div class="toolbar no-print">
+      <button type="button" class="btn btn-primary" id="copy-pick-btn">Copy selection for Claude</button>
+      <button type="button" class="btn" id="download-pick-btn">Download stack-pick.txt</button>
+    </div>
   </header>
 
-  <form id="matrix" class="grid gap-4 lg:grid-cols-3" aria-label="Candidate stacks">
-    <fieldset class="contents">
-      <legend class="sr-only">Choose a stack</legend>
-    </fieldset>
-  </form>
+  <main id="main-content">
+    <div id="matrix-root" class="cards-grid" role="radiogroup" aria-label="Candidate software stacks"></div>
 
-  <footer class="mt-8 grid gap-3 max-w-3xl">
-    <div class="flex flex-wrap items-center gap-3">
-      <button type="button" class="btn" id="proceed-btn">Select Stack &amp; Proceed</button>
-      <button type="button" class="btn btn-ghost" id="gotchas-btn">Copy gotchas only</button>
-      <p class="status" id="status" role="status" aria-live="polite"></p>
+    <div id="fallback-wrap" class="fallback-wrap no-print" hidden>
+      <label for="fallback" class="muted mono">Manual copy fallback (Ctrl/Cmd+C):</label>
+      <textarea id="fallback" class="fallback-box" readonly></textarea>
     </div>
-    <textarea class="fallback" id="fallback" rows="9" readonly hidden aria-label="Selection text (copy manually)"></textarea>
-    <p class="muted" style="font-size:13px">Tags: <span class="tag tag-verified">[Verified]</span> from official docs or benchmarks, <span class="tag tag-inferred">[Inferred]</span> architectural deduction, <span class="tag tag-gotcha">[Gotcha]</span> known edge case.</p>
+  </main>
+
+  <footer class="footer-bar">
+    <span id="live-status" role="status" aria-live="polite">Ready. Arrow keys switch candidate stacks.</span>
+    <span class="mono">VIBECRAFT PICK v2</span>
   </footer>
 </div>
 
 <script>
-// Scout agent: replace CONCEPT and STACKS with the researched data for the user's idea. Keep exactly 3 stacks.
-const CONCEPT = {
-  headline: 'Voice memo app that transcribes and groups notes by project',
-  subline: 'Three stacks scouted for local-first capture, on-device transcription and project grouping. The pick is marked.'
-};
-
+// @vibecraft-data:start
+// Scout agent: replace STACKS only (3 to 4 candidates, lowercase 'verified' | 'inferred' | 'gotcha' tags).
 const STACKS = [
   {
-    id: 'local-first',
-    name: 'Local-First Studio',
-    stack: 'Vite + React 19 + PGlite + Tailwind',
-    pick: true,
-    why: 'Capture and search work with no network, and transcripts never leave the device.',
-    latencyMs: 40, latencyTag: 'inferred', latencyNote: 'Local SQL query to paint, no network hop.',
-    offline: 3, offlineLabel: 'Full offline', offlineTag: 'verified', offlineNote: 'PGlite runs Postgres in WASM and persists to IndexedDB.',
-    cost: '$0 hosting', costNote: 'Static host (Cloudflare Pages or Netlify free tier). Low maintenance.', costTag: 'inferred',
-    gotcha: 'IndexedDB quota eviction: Safari can purge script-written storage after 7 days without a visit.',
-    mitigation: 'Call navigator.storage.persist() on first record and add a one-tap export to a file.'
+    id: 'hono-workers-d1',
+    name: 'Edge API + Node CLI',
+    recommended: true,
+    stack: 'Hono v4 + Cloudflare Workers (D1 + R2) + Node 22 CLI',
+    why: 'Sub-15 ms idempotent edge ingest with SQLite UNIQUE keys on D1 and shared strict Zod contracts across Worker and terminal.',
+    latencyMs: 14,
+    latencyNote: 'P95 edge isolate + D1 INSERT OR IGNORE',
+    latencyTag: 'inferred',
+    offlineLabel: 'CLI works offline; ingest on edge',
+    offlineTag: 'verified',
+    cost: '$0 idle free tier',
+    costTag: 'verified',
+    gotcha: 'Workers enforce a 128 MB isolate memory cap; buffering large NDJSON exports crashes the isolate.',
+    mitigation: 'Enforce 2 MB bodyLimit() on ingest and stream R2 rollups via TransformStream.',
+    gotchas: [
+      {
+        issue: 'Workers enforce a 128 MB isolate memory cap; buffering large NDJSON exports crashes the isolate.',
+        mitigation: 'Enforce 2 MB bodyLimit() on ingest and stream R2 rollups via TransformStream.'
+      },
+      {
+        issue: 'CLI banners written to stdout break piped JSON workflows.',
+        mitigation: 'Send progress and warnings to stderr only; keep stdout strictly structured data.'
+      }
+    ]
   },
   {
-    id: 'saas',
-    name: 'Cloud SaaS',
-    stack: 'Next.js 15 App Router + Supabase + Drizzle + Stripe',
-    pick: false,
-    why: 'Best if sync across devices, teams and paid plans matter more than offline use.',
-    latencyMs: 220, latencyTag: 'inferred', latencyNote: 'Round trip to a regional API plus database.',
-    offline: 1, offlineLabel: 'Needs a service worker', offlineTag: 'inferred', offlineNote: 'Reads can be cached; writes need a queue you build.',
-    cost: '~$45 per month', costNote: 'Supabase Pro plus a Vercel Pro seat. Medium maintenance.', costTag: 'inferred',
-    gotcha: 'Vercel Functions cap request bodies at 4.5 MB, so long memos fail if uploaded through a route handler.',
-    mitigation: 'Upload straight to Supabase Storage with signed URLs and send only the file key to your API.'
+    id: 'tauri-sqlite',
+    name: 'Local-First Desktop',
+    recommended: false,
+    stack: 'Tauri v2 + React 19 + Rust rusqlite (FTS5)',
+    why: '8 MB native OS webview binary with zero cloud dependency and sub-5 ms local full-text search.',
+    latencyMs: 4,
+    latencyNote: 'P95 local FTS5 query on 10k rows',
+    latencyTag: 'inferred',
+    offlineLabel: 'Full local R/W offline',
+    offlineTag: 'verified',
+    cost: '$0 local binary',
+    costTag: 'verified',
+    gotcha: 'Unsigned macOS builds trigger Gatekeeper quarantine warnings for external testers.',
+    mitigation: 'Sign with Developer ID + notarytool in CI before external release.',
+    gotchas: [
+      {
+        issue: 'Unsigned macOS builds trigger Gatekeeper quarantine warnings for external testers.',
+        mitigation: 'Sign with Developer ID + notarytool in CI before external release.'
+      },
+      {
+        issue: 'JSON-serializing multi-MB payloads over invoke() spikes IPC memory 3x.',
+        mitigation: 'Return raw binary ArrayBuffer responses via tauri::ipc::Response.'
+      }
+    ]
   },
   {
-    id: 'desktop',
-    name: 'Desktop Utility',
-    stack: 'Tauri v2 + Rust core + SolidJS',
-    pick: false,
-    why: 'Global hotkey capture and native audio, with a small installed footprint.',
-    latencyMs: 12, latencyTag: 'inferred', latencyNote: 'In-process IPC between the webview and Rust.',
-    offline: 3, offlineLabel: 'Full offline', offlineTag: 'verified', offlineNote: 'Everything runs locally; SQLite via the Tauri SQL plugin.',
-    cost: '$99 per year signing', costNote: 'Apple Developer Program plus notarization and an updater. High maintenance.', costTag: 'verified',
-    gotcha: 'macOS needs NSMicrophoneUsageDescription in Info.plist; without it the mic prompt never appears and recording returns silence.',
-    mitigation: 'Add the key in tauri.conf.json bundle settings and test a signed build, not only tauri dev.'
+    id: 'expo-sqlite-mobile',
+    name: 'Mobile Offline-First',
+    recommended: false,
+    stack: 'Expo SDK 52 + React Native + expo-sqlite (WAL)',
+    why: 'Synchronous JSI SQLite reads on iOS and Android with opportunistic outbox sync on reconnect.',
+    latencyMs: 9,
+    latencyNote: 'P95 indexed JSI query (LIMIT 50)',
+    latencyTag: 'inferred',
+    offlineLabel: 'Full offline queue + sync',
+    offlineTag: 'verified',
+    cost: '$0 local + EAS free tier',
+    costTag: 'verified',
+    gotcha: 'Unindexed scans > 2,000 rows on the JS thread drop gesture animations below 60 fps.',
+    mitigation: 'Enable WAL mode, FTS5 indexes, and keyset pagination (LIMIT 50).',
+    gotchas: [
+      {
+        issue: 'Unindexed scans > 2,000 rows on the JS thread drop gesture animations below 60 fps.',
+        mitigation: 'Enable WAL mode, FTS5 indexes, and keyset pagination (LIMIT 50).'
+      },
+      {
+        issue: 'iOS BGAppRefreshTask caps background execution at 30 seconds.',
+        mitigation: 'Flush outbox mutations on foreground transitions and chunk sync batches under 5 s.'
+      }
+    ]
   }
 ];
+// @vibecraft-data:end
 
-const root = document.getElementById('matrix');
-const status = document.getElementById('status');
-const fallback = document.getElementById('fallback');
-let selectedId = (STACKS.find((s) => s.pick) || STACKS[0]).id;
-let statusTimer = 0;
+const $ = (id) => document.getElementById(id);
+let flashTimer = 0;
 
-const TAG_TEXT = { verified: '[Verified]', inferred: '[Inferred]', gotcha: '[Gotcha]' };
-
-function node(tag, className, text) {
-  const n = document.createElement(tag);
-  if (className) n.className = className;
-  if (text !== undefined) n.textContent = text;
-  return n;
+function announceStatus(msg, btn, doneLabel) {
+  const statusEl = $('live-status');
+  if (statusEl) statusEl.textContent = msg;
+  if (btn && doneLabel) {
+    if (!btn.dataset.origLabel) btn.dataset.origLabel = btn.textContent;
+    btn.textContent = doneLabel;
+    window.clearTimeout(flashTimer);
+    flashTimer = window.setTimeout(() => {
+      btn.textContent = btn.dataset.origLabel;
+    }, 1600);
+  }
 }
 
-function tagEl(kind) {
-  return node('span', 'tag tag-' + kind, TAG_TEXT[kind]);
+async function copyWithFallback(text, btn, doneLabel) {
+  const fbWrap = $('fallback-wrap');
+  const fb = $('fallback');
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      if (fbWrap) fbWrap.hidden = true;
+      announceStatus('Copied to clipboard.', btn, doneLabel || 'Copied ✓');
+      return;
+    }
+    throw new Error('Clipboard API unavailable');
+  } catch (_err) {
+    if (fb && fbWrap) {
+      fbWrap.hidden = false;
+      fb.value = text;
+      fb.focus();
+      fb.select();
+    }
+    announceStatus('Clipboard blocked by sandbox; select and copy from the text box below.', btn, 'Select below');
+  }
 }
 
-function rowEl(label, tag) {
-  const row = node('div', 'row');
-  const head = node('div', 'row-head');
-  head.append(node('span', 'row-label', label), tagEl(tag));
-  row.appendChild(head);
-  return row;
+function downloadBlob(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType || 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  announceStatus('Downloaded ' + filename + '.');
 }
 
-function buildCard(item, maxLatency) {
-  const label = node('label', 'option');
+const TAG_MAP = {
+  verified: { text: '[Verified]', cls: 'tag tag-verified' },
+  inferred: { text: '[Inferred]', cls: 'tag tag-inferred' },
+  gotcha: { text: '[Gotcha]', cls: 'tag tag-gotcha' }
+};
 
-  const input = document.createElement('input');
-  input.type = 'radio';
-  input.name = 'stack';
-  input.value = item.id;
-  input.className = 'sr-only';
-  input.checked = item.id === selectedId;
-  input.addEventListener('change', () => { selectedId = item.id; clearStatus(); });
-
-  const top = node('div', 'grid gap-2');
-  const badges = node('div', 'flex flex-wrap gap-2');
-  if (item.pick) badges.appendChild(node('span', 'badge badge-pick', 'Scout pick'));
-  top.append(badges, node('h3', '', item.name), node('p', 'mono muted', item.stack), node('p', '', item.why));
-
-  const perf = rowEl('Performance', item.latencyTag);
-  const big = node('p', 'big num', item.latencyMs + ' ms');
-  const bar = node('div', 'bar');
-  const fill = node('div', 'bar-fill');
-  fill.style.setProperty('--ratio', String(item.latencyMs / maxLatency));
-  bar.appendChild(fill);
-  perf.append(big, bar, node('p', 'muted', item.latencyNote));
-
-  const off = rowEl('Offline and persistence', item.offlineTag);
-  const dots = node('span', 'dots');
-  dots.setAttribute('role', 'img');
-  dots.setAttribute('aria-label', item.offline + ' of 3');
-  for (let i = 1; i <= 3; i += 1) dots.appendChild(node('span', 'dot' + (i <= item.offline ? ' on' : '')));
-  const offHead = node('div', 'flex items-center gap-3');
-  offHead.append(dots, node('span', '', item.offlineLabel));
-  off.append(offHead, node('p', 'muted', item.offlineNote));
-
-  const cost = rowEl('Hosting cost and upkeep', item.costTag);
-  cost.append(node('p', 'big', item.cost), node('p', 'muted', item.costNote));
-
-  const risk = rowEl('Risk flag', 'gotcha');
-  const box = node('div', 'gotcha');
-  box.append(node('p', '', item.gotcha), node('p', 'muted', 'Fix: ' + item.mitigation));
-  risk.appendChild(box);
-
-  label.append(input, node('span', 'indicator'), top, perf, off, cost, risk);
-  return label;
+function resolveTag(raw) {
+  const key = String(raw || '').replace(/[\[\]]/g, '').trim().toLowerCase();
+  return TAG_MAP[key] || TAG_MAP.inferred;
 }
 
-function render() {
-  document.getElementById('headline').textContent = CONCEPT.headline;
-  document.getElementById('subline').textContent = CONCEPT.subline;
-  const maxLatency = Math.max(...STACKS.map((s) => s.latencyMs));
-  const fieldset = root.querySelector('fieldset');
-  STACKS.forEach((item) => fieldset.appendChild(buildCard(item, maxLatency)));
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+let selectedId = null;
+
+function normalizeGotchas(item) {
+  if (Array.isArray(item.gotchas) && item.gotchas.length > 0) {
+    return item.gotchas.filter((g) => g && g.issue);
+  }
+  if (item.gotcha) {
+    return [{ issue: String(item.gotcha), mitigation: String(item.mitigation || '') }];
+  }
+  return [];
 }
 
 function selectionText() {
-  const item = STACKS.find((s) => s.id === selectedId);
-  return [
-    'VIBECRAFT PICK · Phase 1 · Research Scout',
-    'Stack: ' + item.stack + ' (' + item.name + ')',
-    'Why: ' + item.why,
-    'Performance: ' + item.latencyMs + ' ms ' + TAG_TEXT[item.latencyTag],
-    'Offline: ' + item.offlineLabel + ' ' + TAG_TEXT[item.offlineTag],
-    'Cost: ' + item.cost + ' ' + TAG_TEXT[item.costTag],
-    '[Gotcha] ' + item.gotcha,
-    'Fix: ' + item.mitigation,
-    '',
-    'Continue: start Phase 2 (Brand Artisan) with this stack.'
-  ].join('\n');
+  const list = Array.isArray(STACKS) ? STACKS : [];
+  const item = list.find((s) => s && s.id === selectedId) || list[0];
+  if (!item) return 'VIBECRAFT PICK v2 · Phase 1 · Research Scout\nError: No stack candidates loaded.';
+  const lines = [
+    'VIBECRAFT PICK v2 · Phase 1 · Research Scout',
+    'ArchetypeId: ' + (item.id || 'custom'),
+    'Stack: ' + (item.stack || 'Unspecified') + ' (' + (item.name || 'Candidate') + ')',
+    'Why: ' + (item.why || ''),
+    'Performance: ' + (Number(item.latencyMs) || 0) + ' ms ' + resolveTag(item.latencyTag).text,
+    'Offline: ' + (item.offlineLabel || '') + ' ' + resolveTag(item.offlineTag).text,
+    'Cost: ' + (item.cost || '') + ' ' + resolveTag(item.costTag).text,
+    ''
+  ];
+  const gotchas = normalizeGotchas(item);
+  gotchas.forEach((g, idx) => {
+    const label = gotchas.length > 1 ? '[Gotcha ' + (idx + 1) + '] ' : '[Gotcha] ';
+    lines.push(label + g.issue);
+    lines.push('Fix: ' + (g.mitigation || 'Document mitigation in Phase 3'));
+  });
+  return lines.join('\n');
 }
 
-function gotchaText() {
-  const item = STACKS.find((s) => s.id === selectedId);
-  return '[Gotcha] ' + item.gotcha + '\nFix: ' + item.mitigation;
-}
+function renderMatrix() {
+  const root = $('matrix-root');
+  root.replaceChildren();
 
-function legacyCopy(text) {
-  const area = document.createElement('textarea');
-  area.value = text;
-  area.setAttribute('readonly', '');
-  area.style.position = 'fixed';
-  area.style.opacity = '0';
-  document.body.appendChild(area);
-  area.select();
-  let ok = false;
-  try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
-  area.remove();
-  return ok;
-}
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (error) {
-    return legacyCopy(text);
+  if (!Array.isArray(STACKS) || STACKS.length === 0) {
+    const empty = el('div', 'empty-state', 'No stack candidates available in STACKS. Re-run Phase 1 Research Scout to populate 3 to 4 options.');
+    root.appendChild(empty);
+    $('copy-pick-btn').disabled = true;
+    $('download-pick-btn').disabled = true;
+    return;
   }
-}
 
-function clearStatus() {
-  status.textContent = '';
-  fallback.hidden = true;
-}
+  $('copy-pick-btn').disabled = false;
+  $('download-pick-btn').disabled = false;
 
-async function copyWithFeedback(text, successMessage) {
-  const ok = await copyText(text);
-  window.clearTimeout(statusTimer);
-  if (ok) {
-    status.textContent = successMessage;
-    fallback.hidden = true;
-    statusTimer = window.setTimeout(clearStatus, 4000);
-  } else {
-    status.textContent = 'Clipboard is blocked here. Copy the selected text below.';
-    fallback.value = text;
-    fallback.hidden = false;
-    fallback.focus();
-    fallback.select();
+  if (!selectedId || !STACKS.some((s) => s && s.id === selectedId)) {
+    const rec = STACKS.find((s) => s && s.recommended) || STACKS[0];
+    selectedId = rec ? rec.id : null;
   }
+
+  const maxLatency = Math.max(1, ...STACKS.map((s) => Math.max(0, Number(s && s.latencyMs) || 0)));
+
+  STACKS.forEach((item, index) => {
+    if (!item || typeof item !== 'object') return;
+    const isSelected = item.id === selectedId;
+    const card = el('div', 'option-card');
+    card.setAttribute('role', 'radio');
+    card.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+    card.tabIndex = isSelected ? 0 : -1;
+    card.dataset.id = item.id || String(index);
+
+    const top = el('div', 'card-top');
+    const titleWrap = el('div');
+    titleWrap.appendChild(el('h2', '', item.name || 'Candidate ' + (index + 1)));
+    titleWrap.appendChild(el('p', 'stack-line', item.stack || ''));
+    top.appendChild(titleWrap);
+    if (item.recommended) {
+      top.appendChild(el('span', 'tag tag-verified', 'Recommended'));
+    }
+    card.appendChild(top);
+    card.appendChild(el('p', 'muted', item.why || ''));
+
+    const metrics = el('div', 'metric-list');
+    const latVal = Math.max(0, Number(item.latencyMs) || 0);
+    const pct = Math.min(100, Math.max(4, Math.round((latVal / maxLatency) * 100)));
+
+    const latRow = el('div', 'metric-row');
+    latRow.appendChild(el('span', 'mono', latVal + ' ms · ' + (item.latencyNote || 'critical path')));
+    const latBadge = resolveTag(item.latencyTag);
+    latRow.appendChild(el('span', latBadge.cls, latBadge.text));
+    metrics.appendChild(latRow);
+
+    const barTrack = el('div', 'bar-track');
+    const barFill = el('div', 'bar-fill');
+    barFill.style.width = pct + '%';
+    barTrack.appendChild(barFill);
+    metrics.appendChild(barTrack);
+
+    const offRow = el('div', 'metric-row');
+    offRow.appendChild(el('span', '', 'Offline: ' + (item.offlineLabel || 'Unspecified')));
+    const offBadge = resolveTag(item.offlineTag);
+    offRow.appendChild(el('span', offBadge.cls, offBadge.text));
+    metrics.appendChild(offRow);
+
+    const costRow = el('div', 'metric-row');
+    costRow.appendChild(el('span', 'tabular', 'Cost: ' + (item.cost || 'Unspecified')));
+    const costBadge = resolveTag(item.costTag);
+    costRow.appendChild(el('span', costBadge.cls, costBadge.text));
+    metrics.appendChild(costRow);
+
+    card.appendChild(metrics);
+
+    const gotchaWrap = el('div', 'gotcha-list');
+    normalizeGotchas(item).forEach((g, gIdx) => {
+      const box = el('div', 'gotcha-box');
+      const gHead = el('span', 'tag tag-gotcha', 'Gotcha ' + (gIdx + 1));
+      box.appendChild(gHead);
+      box.appendChild(el('p', '', g.issue));
+      if (g.mitigation) {
+        box.appendChild(el('p', 'muted', 'Mitigation: ' + g.mitigation));
+      }
+      gotchaWrap.appendChild(box);
+    });
+    card.appendChild(gotchaWrap);
+
+    card.addEventListener('click', () => {
+      selectedId = item.id;
+      renderMatrix();
+      const active = root.querySelector('[aria-checked="true"]');
+      if (active) active.focus();
+    });
+
+    card.addEventListener('keydown', (ev) => {
+      if (ev.key === ' ' || ev.key === 'Enter') {
+        ev.preventDefault();
+        selectedId = item.id;
+        renderMatrix();
+        return;
+      }
+      if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(ev.key)) {
+        ev.preventDefault();
+        const dir = ev.key === 'ArrowRight' || ev.key === 'ArrowDown' ? 1 : -1;
+        const nextIdx = (index + dir + STACKS.length) % STACKS.length;
+        selectedId = STACKS[nextIdx].id;
+        renderMatrix();
+        const active = root.querySelector('[aria-checked="true"]');
+        if (active) active.focus();
+      }
+    });
+
+    root.appendChild(card);
+  });
 }
 
-render();
-document.getElementById('proceed-btn').addEventListener('click', () => copyWithFeedback(selectionText(), 'Copied. Paste it into the chat to start Phase 2.'));
-document.getElementById('gotchas-btn').addEventListener('click', () => copyWithFeedback(gotchaText(), 'Gotcha and fix copied.'));
+$('copy-pick-btn').addEventListener('click', () => {
+  copyWithFallback(selectionText(), $('copy-pick-btn'), 'Copied lock ✓');
+});
+
+$('download-pick-btn').addEventListener('click', () => {
+  downloadBlob('stack-pick.txt', selectionText() + '\n', 'text/plain;charset=utf-8');
+});
+
+renderMatrix();
 </script>
 </body>
 </html>

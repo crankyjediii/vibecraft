@@ -1,0 +1,2 @@
+.action { color: var(--fg-primary); }
+.action:hover { border-color: var(--accent); }

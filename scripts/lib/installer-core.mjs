@@ -120,11 +120,7 @@ function writeAtomic0600(logicalPath, content) {
     fs.renameSync(tmpPath, writeTarget);
     fs.chmodSync(writeTarget, 0o600);
   } catch (err) {
-    try {
-      if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
-    } catch {
-      // Ignore secondary cleanup error
-    }
+    fs.rmSync(tmpPath, { force: true });
     throw err;
   }
 }

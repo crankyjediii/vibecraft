@@ -57,25 +57,25 @@ interface ThemeTokens {
   name: string;               // Display name, e.g. 'Swiss Grid'
   scheme: 'dark' | 'light';
   tagline: string;            // 1-line typographic/surface summary
-  bg: string;
-  surface: string;
-  'surface-2': string;
+  'bg-primary': string;
+  'bg-surface': string;
+  'bg-raised': string;
+  'fg-primary': string;
+  'fg-muted': string;
   border: string;
-  'border-strong': string;
-  ink: string;
-  muted: string;
   accent: string;
+  'accent-2': string;
   'accent-fg': string;
-  'accent-soft': string;
-  ok: string;
-  warn: string;
+  success: string;
   danger: string;
   radius: string;
-  'radius-sm': string;
-  shadow: string;
-  'font-display': string;
+  'radius-btn': string;
   'font-sans': string;
+  'font-display': string;
   'font-mono': string;
+  'shadow-overlay': string;
+  blur: string;
+  'shape-opacity': string;
 }
 ```
 

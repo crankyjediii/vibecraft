@@ -1,0 +1,2 @@
+:root { --shadow-overlay: 0 12px 28px rgba(0, 0, 0, 0.28); }
+.dialog { box-shadow: var(--shadow-overlay); }

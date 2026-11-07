@@ -1,441 +1,848 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>VibeCraft QA Report</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
-<script src="https://cdn.tailwindcss.com"></script>
+<title>VibeCraft · Phase 4 QA Audit Report</title>
 <style>
 :root {
-  --bg-primary: #09090b;
-  --bg-surface: #18181b;
-  --bg-raised: #27272a;
-  --fg-primary: #ededef;
-  --fg-muted: #9a9aa5;
-  --border: rgba(255, 255, 255, 0.08);
-  --accent: #5e6ad2;
-  --accent-fg: #fafafa;
-  --success: #4ade80;
-  --warn: #fbbf24;
-  --danger: #f87171;
+  --bg-primary: #0b0c0e;
+  --bg-surface: #121417;
+  --bg-raised: #191c21;
+  --fg-primary: #f4f5f8;
+  --fg-muted: #8c93a3;
+  --border: rgba(244, 245, 248, 0.10);
+  --border-strong: rgba(244, 245, 248, 0.22);
+  --accent: #7c89ff;
+  --accent-fg: #0b0c0e;
+  --accent-soft: rgba(124, 137, 255, 0.12);
+  --success: #3dd68c;
+  --success-soft: rgba(61, 214, 140, 0.12);
+  --warn: #f5a623;
+  --warn-soft: rgba(245, 166, 35, 0.12);
+  --danger: #ff7373;
+  --danger-soft: rgba(255, 115, 115, 0.12);
   --radius: 8px;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --radius-sm: 6px;
+  --shadow-overlay: 0 10px 28px rgba(0, 0, 0, 0.42);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: light) {
   :root {
-    --bg-primary: #fbfbfa;
-    --bg-surface: #f4f4f1;
-    --bg-raised: #e9e9e5;
-    --fg-primary: #18181b;
-    --fg-muted: #52525b;
-    --border: rgba(24, 24, 27, 0.12);
-    --accent: #4f58b8;
-    --accent-fg: #fafafa;
-    --success: #15803d;
-    --warn: #a16207;
-    --danger: #b91c1c;
+    --bg-primary: #f6f6f4;
+    --bg-surface: #fcfcfa;
+    --bg-raised: #ebebea;
+    --fg-primary: #161618;
+    --fg-muted: #525259;
+    --border: rgba(22, 22, 24, 0.12);
+    --border-strong: rgba(22, 22, 24, 0.26);
+    --accent: #3b46b8;
+    --accent-fg: #fcfcfa;
+    --accent-soft: rgba(59, 70, 184, 0.09);
+    --success: #136c2e;
+    --success-soft: rgba(19, 108, 46, 0.10);
+    --warn: #854800;
+    --warn-soft: rgba(133, 72, 0, 0.10);
+    --danger: #b01c12;
+    --danger-soft: rgba(176, 28, 18, 0.10);
+    --shadow-overlay: 0 8px 24px rgba(22, 22, 24, 0.08);
   }
 }
-
 *, *::before, *::after { box-sizing: border-box; }
-.grid > * { min-width: 0; }
-html { color-scheme: light dark; }
-body { margin: 0; background-color: var(--bg-primary); color: var(--fg-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.55; }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-h1, h2, h3, p, ul { margin: 0; }
-body h1 { font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
-body h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
-body h3 { font-size: 17px; font-weight: 600; line-height: 1.25; }
-ul { padding: 0; list-style: none; }
-.mono { font-family: var(--font-mono); }
-.num { font-variant-numeric: tabular-nums; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-primary);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.shell {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-block: 24px 40px;
+  padding-inline: 16px;
+}
+@media (min-width: 768px) {
+  .shell { padding-inline: 28px; }
+}
+.eyebrow {
+  margin: 0 0 4px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+p { margin: 0; overflow-wrap: anywhere; }
 .muted { color: var(--fg-muted); }
-
-.panel { background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
-.verdict { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px; border-radius: 9999px; font-weight: 600; font-size: 14px; border: 1px solid var(--border); }
-.verdict[data-ok="true"] { color: var(--success); }
-.verdict[data-ok="false"] { color: var(--danger); }
-.verdict-dot { width: 8px; height: 8px; border-radius: 9999px; background-color: currentColor; }
-
-.kpi-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
-.kpi-value { font-size: 36px; font-weight: 600; line-height: 1.1; }
-.kpi-hero { font-size: 64px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
-.meter { height: 10px; border-radius: 9999px; background-color: var(--bg-raised); overflow: hidden; }
-.meter-fill { height: 100%; border-radius: 9999px; background-color: var(--success); transform-origin: left center; transform: scaleX(var(--ratio, 0)); transition: transform 250ms ease-out; }
-.meter-fill[data-bad="true"] { background-color: var(--danger); }
-
-.table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 14px; }
-.table th:not(:first-child), .table td:not(:first-child) { width: 104px; }
-.table td:first-child { overflow-wrap: anywhere; }
-.table th { text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); padding: 8px 0; border-bottom: 1px solid var(--border); }
-.table td { padding: 10px 0; border-bottom: 1px solid var(--border); }
-.table td:not(:first-child), .table th:not(:first-child) { text-align: right; }
-
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { position: relative; }
-.chip input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
-.chip span {
-  display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 9999px;
-  border: 1px solid var(--border); font-size: 13px; font-weight: 500; color: var(--fg-muted);
-  transition: background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.tabular { font-variant-numeric: tabular-nums; }
+.header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-end: 20px;
+  padding-block-end: 16px;
+  border-block-end: 1px solid var(--border);
 }
-.chip:hover span { background-color: var(--bg-raised); }
-.chip input:checked + span { background-color: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
-.chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-.hunk { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background-color: var(--bg-primary); }
-.hunk-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding: 10px 14px; background-color: var(--bg-raised); font-size: 13px; }
-.code { margin: 0; padding: 8px 0; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; overflow-x: auto; }
-.line { display: grid; grid-template-columns: 28px 1fr; padding: 0 14px 0 0; white-space: pre; }
-.line .mark { text-align: center; color: var(--fg-muted); user-select: none; }
-.line.del { background-color: color-mix(in srgb, var(--danger) 14%, transparent); }
-.line.del .mark { color: var(--danger); }
-.line.add { background-color: color-mix(in srgb, var(--success) 14%, transparent); }
-.line.add .mark { color: var(--success); }
-.reason { padding: 10px 14px; font-size: 13px; color: var(--fg-muted); border-top: 1px solid var(--border); }
-
-.fix { display: grid; grid-template-columns: 24px 1fr; gap: 12px; padding: 14px 0; border-top: 1px solid var(--border); }
-.check { width: 20px; height: 20px; border-radius: 9999px; background-color: var(--success); color: var(--bg-primary); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
-
-.stamp { font-family: var(--font-mono); font-size: 14px; padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius); background-color: var(--bg-surface); overflow-x: auto; white-space: nowrap; }
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 16px;
-  border-radius: var(--radius); border: 1px solid var(--border); background-color: transparent; color: var(--fg-primary);
-  font: inherit; font-weight: 600; font-size: 14px; cursor: pointer;
-  transition: background-color 150ms ease-out, transform 150ms ease-out, opacity 150ms ease-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  min-width: 38px;
+  padding-block: 8px;
+  padding-inline: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 550;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, opacity 140ms ease;
 }
-.btn:hover:not(:disabled) { background-color: var(--bg-raised); }
-.btn:active:not(:disabled) { transform: translateY(1px); }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background-color: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
-.btn-primary:hover:not(:disabled) { background-color: color-mix(in srgb, var(--accent) 86%, var(--fg-primary)); }
-.status { font-size: 13px; color: var(--fg-muted); min-height: 20px; }
-.empty { padding: 20px; text-align: center; color: var(--fg-muted); border: 1px dashed var(--border); border-radius: var(--radius); }
-.fallback { width: 100%; padding: 12px; background-color: var(--bg-surface); color: var(--fg-primary); border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--font-mono); font-size: 13px; }
-
+.btn:hover:not(:disabled) {
+  background: var(--bg-raised);
+  border-color: var(--border-strong);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: transparent;
+  font-weight: 600;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--fg-primary);
+  opacity: 0.92;
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--fg-primary);
+  outline-offset: 2px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tag-verified { background: var(--success-soft); color: var(--success); }
+.tag-inferred { background: var(--accent-soft); color: var(--accent); }
+.tag-gotcha, .tag-warn { background: var(--warn-soft); color: var(--warn); }
+.tag-danger { background: var(--danger-soft); color: var(--danger); }
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  min-width: 0;
+}
+.empty-state {
+  background: var(--bg-surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  color: var(--fg-muted);
+}
+.fallback-wrap {
+  margin-block-start: 12px;
+}
+.fallback-box {
+  width: 100%;
+  min-height: 110px;
+  margin-block-start: 6px;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-raised);
+  color: var(--fg-primary);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.fallback-box:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.footer-bar {
+  margin-block-start: 24px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.84rem;
+  color: var(--fg-muted);
+}
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+@media print {
+  body { background: var(--bg-surface); }
+  .no-print { display: none !important; }
+  .shell { max-width: 100%; padding: 0; }
+  .panel { break-inside: avoid; }
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-block-end: 20px;
+}
+.kpi-val {
+  font-size: 1.55rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-block-top: 4px;
+}
+.stamp-banner {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-raised);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  margin-block-end: 20px;
+  overflow-x: auto;
+}
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-end: 14px;
+}
+.chip-btn {
+  min-height: 36px;
+  padding-block: 6px;
+  padding-inline: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 550;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.chip-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-raised);
+}
+.chip-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.chip-btn[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.diff-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.diff-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+.diff-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-raised);
+  border-block-end: 1px solid var(--border);
+}
+.diff-pre {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.diff-pre:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.line-del {
+  display: block;
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding-inline: 6px;
+}
+.line-add {
+  display: block;
+  background: var(--success-soft);
+  color: var(--success);
+  padding-inline: 6px;
+}
+.line-ctx {
+  display: block;
+  color: var(--fg-muted);
+  padding-inline: 6px;
+}
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-block-start: 20px;
+}
+@media (min-width: 820px) {
+  .two-col { grid-template-columns: 1fr 1fr; }
+}
+.file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-block: 6px;
+  border-block-end: 1px solid var(--border);
+  font-size: 0.84rem;
 }
 </style>
 </head>
 <body>
-<div class="min-h-screen px-4 py-6 md:px-8 md:py-10">
-  <header class="flex flex-wrap items-end justify-between gap-4 pb-8">
-    <div class="grid gap-2">
-      <h2>Phase 4 of 4 · QA Auditor</h2>
-      <h1 id="title"></h1>
+<div class="shell">
+  <header class="header-row">
+    <div>
+      <p class="eyebrow">Phase 4 of 4 · QA Auditor</p>
+      <h1 id="report-title">QA Audit &amp; Deslop Report</h1>
+      <p class="muted" id="verdict-line"></p>
     </div>
-    <span class="verdict" id="verdict" aria-live="polite"><span class="verdict-dot"></span><span id="verdict-text"></span></span>
+    <div class="toolbar no-print">
+      <button type="button" class="btn btn-primary" id="copy-stamp-btn">Copy QA stamp</button>
+      <button type="button" class="btn" id="download-json-btn">Download qa-report.json</button>
+    </div>
   </header>
 
-  <main class="grid gap-6">
-    <section class="grid gap-6 lg:grid-cols-[1.4fr_1fr_1fr]" aria-label="Gate summary">
-      <div class="panel grid gap-4 content-between">
-        <div class="grid gap-1">
-          <p class="kpi-label">Token adherence</p>
-          <p class="kpi-hero num" id="token-pct"></p>
-        </div>
-        <div class="grid gap-2">
-          <div class="meter" role="meter" id="token-meter" aria-label="Token adherence" aria-valuemin="0" aria-valuemax="100"><div class="meter-fill" id="token-fill"></div></div>
-          <p class="muted num" id="token-line"></p>
-        </div>
-      </div>
-      <div class="panel grid gap-2 content-start">
-        <p class="kpi-label">Syntax and types</p>
-        <p class="kpi-value num" id="syntax-pct"></p>
-        <p class="muted num" id="syntax-line"></p>
-      </div>
-      <div class="panel grid gap-2 content-start">
-        <p class="kpi-label">Slop scrubbed</p>
-        <p class="kpi-value num" id="slop-count"></p>
-        <p class="muted" id="slop-line"></p>
-      </div>
+  <main id="main-content">
+    <div id="stamp-banner" class="stamp-banner" role="region" aria-label="Measured QA stamp"></div>
+
+    <section aria-labelledby="metrics-heading">
+      <h2 id="metrics-heading" class="sr-only">Audit summary metrics</h2>
+      <div id="kpi-grid" class="kpi-grid"></div>
     </section>
 
-    <section class="panel grid gap-4" aria-labelledby="tokens-h">
-      <h2 id="tokens-h">Token scan by file</h2>
-      <p class="mono muted" style="font-size:13px" id="regex-line"></p>
-      <table class="table">
-        <thead><tr><th scope="col">File</th><th scope="col">Color references</th><th scope="col">Hardcoded</th></tr></thead>
-        <tbody id="token-rows"></tbody>
-      </table>
+    <section aria-labelledby="diffs-heading">
+      <h2 id="diffs-heading" style="margin-block-end: 10px;">Automated repair hunks</h2>
+      <div id="filter-row" class="filter-row no-print" role="toolbar" aria-label="Filter repairs by category"></div>
+      <div id="diff-list" class="diff-stack"></div>
     </section>
 
-    <section class="panel grid gap-4" aria-labelledby="diff-h">
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="diff-h">Anti-slop diff</h2>
-        <fieldset class="chips border-0 p-0 m-0" id="filters"><legend class="sr-only">Filter diff by category</legend></fieldset>
-      </div>
-      <div class="grid gap-4" id="hunks"></div>
-    </section>
+    <div class="two-col">
+      <section class="panel" aria-labelledby="tokens-heading">
+        <h2 id="tokens-heading" style="margin-block-end: 10px;">Token adherence by file</h2>
+        <div id="token-files"></div>
+      </section>
+      <section class="panel" aria-labelledby="gotchas-heading">
+        <h2 id="gotchas-heading" style="margin-block-end: 10px;">Verified gotcha mitigations</h2>
+        <div id="gotcha-fixes"></div>
+      </section>
+    </div>
 
-    <section class="panel grid gap-1" aria-labelledby="fix-h">
-      <h2 id="fix-h" class="pb-3">Proactive gotcha fixes applied</h2>
-      <ul id="fixes"></ul>
-    </section>
-
-    <section class="grid gap-3">
-      <div class="stamp" id="stamp" role="status"></div>
-      <div class="flex flex-wrap items-center gap-3">
-        <button type="button" class="btn btn-primary" id="copy-stamp">Copy audit stamp</button>
-        <button type="button" class="btn" id="copy-report">Copy full report</button>
-        <p class="status" id="status" role="status" aria-live="polite"></p>
-      </div>
-      <textarea class="fallback" id="fallback" rows="10" readonly hidden aria-label="Report text (copy manually)"></textarea>
-    </section>
+    <div id="fallback-wrap" class="fallback-wrap no-print" hidden>
+      <label for="fallback" class="muted mono">Manual copy fallback (Ctrl/Cmd+C):</label>
+      <textarea id="fallback" class="fallback-box" readonly></textarea>
+    </div>
   </main>
+
+  <footer class="footer-bar">
+    <span id="live-status" role="status" aria-live="polite">Measured QA report loaded.</span>
+    <span class="mono">Audit Engine v2 (VC000..VC018)</span>
+  </footer>
 </div>
 
 <script>
-// Auditor agent: replace REPORT with the measured results of the real run. Numbers drive every meter and the stamp.
+// @vibecraft-data:start
+// @audit-data:start
+// Auditor agent: replace REPORT with real measured counts only.
 const REPORT = {
-  project: 'Voice memo app · QA report',
-  syntax: { files: 42, errors: 0, warnings: 0, checker: 'tsc --noEmit --strict' },
+  project: 'HookDrain · Phase 4 QA Audit',
+  passesRun: 2,
+  openSlop: 0,
+  openGotchas: 0,
+  syntax: {
+    files: 8,
+    errors: 0,
+    warnings: 0,
+    checker: 'tsc --noEmit --strict'
+  },
   tokens: {
-    regex: '#[0-9a-fA-F]{3,8}\\b|rgba?\\(|hsla?\\(|oklch\\(',
     files: [
-      { name: 'src/App.tsx', refs: 48, hardcoded: 0 },
-      { name: 'src/components/Recorder.tsx', refs: 71, hardcoded: 0 },
-      { name: 'src/components/MemoList.tsx', refs: 64, hardcoded: 0 },
-      { name: 'src/components/ProjectSidebar.tsx', refs: 39, hardcoded: 0 },
-      { name: 'src/styles/tokens.css', refs: 90, hardcoded: 0, note: 'definitions' }
+      { file: 'src/worker/index.ts', refs: 12, hardcoded: 0 },
+      { file: 'src/ui/dashboard.tsx', refs: 34, hardcoded: 0 },
+      { file: 'src/ui/filter-bar.css', refs: 18, hardcoded: 0 }
     ]
   },
   diffs: [
     {
-      category: 'comments', file: 'src/hooks/useRecorder.ts',
-      reason: 'Narration that restates the code was deleted.',
+      category: 'tokens',
+      file: 'src/ui/dashboard.tsx',
+      why: 'Replaced literal hex badge border with semantic var(--success) token (VC001).',
       lines: [
-        { t: 'ctx', s: 'function onChunk(event: BlobEvent): void {' },
-        { t: 'del', s: '  // increment chunk counter by 1' },
-        { t: 'ctx', s: '  chunkCount += 1;' },
-        { t: 'del', s: '  // push the blob to the chunks array' },
-        { t: 'ctx', s: '  chunks.push(event.data);' },
-        { t: 'ctx', s: '}' }
+        { t: 'del', s: '  <span style={{ borderColor: "#10b981" }}>Healthy</span>' },
+        { t: 'add', s: '  <span style={{ borderColor: "var(--success)" }}>Healthy</span>' }
       ]
     },
     {
-      category: 'defensive', file: 'src/lib/projects.ts',
-      reason: 'JSON.stringify on a typed Project cannot throw here, so the guard protected an impossible state.',
+      category: 'style',
+      file: 'src/ui/filter-bar.css',
+      why: 'Scoped wildcard transition to explicit properties (VC006).',
       lines: [
-        { t: 'ctx', s: 'export function serializeProject(project: Project): string {' },
-        { t: 'del', s: '  try {' },
-        { t: 'del', s: '    return JSON.stringify(project);' },
-        { t: 'del', s: '  } catch (error) {' },
-        { t: 'del', s: '    return "{}";' },
-        { t: 'del', s: '  }' },
-        { t: 'add', s: '  return JSON.stringify(project);' },
-        { t: 'ctx', s: '}' }
+        { t: 'del', s: '  transition: all 150ms ease;' },
+        { t: 'add', s: '  transition: background-color 150ms ease, border-color 150ms ease;' }
       ]
     },
     {
-      category: 'types', file: 'src/lib/db.ts',
-      reason: 'The unknown-then-assert cast was replaced by a typed query result.',
+      category: 'comments',
+      file: 'src/worker/rollup-stream.ts',
+      why: 'Removed self-restating narration comment (VC017).',
       lines: [
-        { t: 'ctx', s: 'export async function listMemos(projectId: string): Promise<MemoRow[]> {' },
-        { t: 'del', s: '  const rows = (await db.query(sql, [projectId])) as unknown as MemoRow[];' },
-        { t: 'add', s: '  const { rows } = await db.query<MemoRow>(sql, [projectId]);' },
-        { t: 'ctx', s: '  return rows;' },
-        { t: 'ctx', s: '}' }
-      ]
-    },
-    {
-      category: 'helpers', file: 'src/components/MemoList.tsx',
-      reason: 'A one-use wrapper with no domain meaning was inlined.',
-      lines: [
-        { t: 'del', s: 'const getMemoCount = (list: Memo[]): number => list.length;' },
-        { t: 'ctx', s: '' },
-        { t: 'del', s: '<span>{getMemoCount(memos)} memos</span>' },
-        { t: 'add', s: '<span>{memos.length} memos</span>' }
-      ]
-    },
-    {
-      category: 'tokens', file: 'src/components/Recorder.tsx',
-      reason: 'A literal color moved to a token class.',
-      lines: [
-        { t: 'del', s: '<div style={{ background: "white" }}>' },
-        { t: 'add', s: '<div className="bg-surface">' }
+        { t: 'del', s: '  // increment row counter by 1' },
+        { t: 'ctx', s: '  rowCount += 1;' }
       ]
     }
   ],
-  fixes: [
-    { title: 'IndexedDB quota eviction', detail: 'navigator.storage.persist() is requested on the first saved memo, and Settings has a one-tap export.' },
-    { title: 'WebAudio leak on tab unfocus', detail: 'AudioContext closes on visibilitychange and its tracks are stopped, so the mic indicator clears.' },
-    { title: 'Transcription blocks the UI thread', detail: 'Whisper runs in a dedicated worker; the main thread only receives text segments.' }
+  gotchas: [
+    {
+      issue: '128 MB Worker isolate memory ceiling on NDJSON archive rollups',
+      mitigation: '2 MB bodyLimit() on /ingest + TransformStream chunked R2 multipart upload.',
+      file: 'src/worker/rollup-stream.ts',
+      verified: true
+    },
+    {
+      issue: 'CLI progress output corrupting piped JSON stdout',
+      mitigation: 'Diagnostics routed exclusively to process.stderr; stdout emits NDJSON only.',
+      file: 'src/cli/drain.ts',
+      verified: true
+    }
   ]
 };
+// @audit-data:end
+// @vibecraft-data:end
 
-const CATEGORY_LABELS = { all: 'All', comments: 'Comments', defensive: 'Defensive checks', types: 'Type laundering', helpers: 'Helpers', tokens: 'Tokens' };
 const $ = (id) => document.getElementById(id);
-let statusTimer = 0;
+let flashTimer = 0;
 
-function node(tag, className, text) {
-  const n = document.createElement(tag);
-  if (className) n.className = className;
-  if (text !== undefined) n.textContent = text;
-  return n;
+function announceStatus(msg, btn, doneLabel) {
+  const statusEl = $('live-status');
+  if (statusEl) statusEl.textContent = msg;
+  if (btn && doneLabel) {
+    if (!btn.dataset.origLabel) btn.dataset.origLabel = btn.textContent;
+    btn.textContent = doneLabel;
+    window.clearTimeout(flashTimer);
+    flashTimer = window.setTimeout(() => {
+      btn.textContent = btn.dataset.origLabel;
+    }, 1600);
+  }
 }
 
-function totals() {
-  const refs = REPORT.tokens.files.reduce((sum, f) => sum + f.refs, 0);
-  const bad = REPORT.tokens.files.reduce((sum, f) => sum + f.hardcoded, 0);
-  const pct = refs === 0 ? 100 : Math.round((100 * (refs - bad)) / refs);
-  const removed = REPORT.diffs.reduce((sum, d) => sum + d.lines.filter((l) => l.t === 'del').length, 0);
-  const syntaxOk = REPORT.syntax.errors === 0;
-  return { refs, bad, pct, removed, syntaxOk, ok: syntaxOk && bad === 0 };
+async function copyWithFallback(text, btn, doneLabel) {
+  const fbWrap = $('fallback-wrap');
+  const fb = $('fallback');
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      if (fbWrap) fbWrap.hidden = true;
+      announceStatus('Copied to clipboard.', btn, doneLabel || 'Copied ✓');
+      return;
+    }
+    throw new Error('Clipboard API unavailable');
+  } catch (_err) {
+    if (fb && fbWrap) {
+      fbWrap.hidden = false;
+      fb.value = text;
+      fb.focus();
+      fb.select();
+    }
+    announceStatus('Clipboard blocked by sandbox; select and copy from the text box below.', btn, 'Select below');
+  }
 }
 
-function stampText() {
-  const t = totals();
-  const slop = t.bad === 0 ? 'Scrubbed' : t.bad + ' Remaining';
-  return '🛡️ Auditor: [Syntax: ' + REPORT.syntax.errors + ' Errors] • [Tokens: ' + t.pct + '% Validated] • [Slop: ' + slop + ']';
+function downloadBlob(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType || 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  announceStatus('Downloaded ' + filename + '.');
 }
 
-function reportText() {
-  const t = totals();
-  const out = [REPORT.project, stampText(), '', 'Syntax: ' + REPORT.syntax.files + ' files, ' + REPORT.syntax.errors + ' errors (' + REPORT.syntax.checker + ')', 'Tokens: ' + t.refs + ' color references, ' + t.bad + ' hardcoded', 'Slop lines removed: ' + t.removed, '', 'Gotcha fixes:'];
-  REPORT.fixes.forEach((f) => out.push('- ' + f.title + ': ' + f.detail));
-  return out.join('\n');
-}
+const CATEGORY_LABELS = {
+  all: 'All',
+  comments: 'Comments',
+  defensive: 'Defensive checks',
+  types: 'Type safety',
+  helpers: 'Helpers',
+  tokens: 'Tokens',
+  placeholder: 'Placeholders',
+  style: 'Craft & motion',
+  prose: 'Prose scrub'
+};
 
-function renderSummary() {
-  const t = totals();
-  $('title').textContent = REPORT.project;
-  const verdict = $('verdict');
-  verdict.dataset.ok = String(t.ok);
-  $('verdict-text').textContent = t.ok ? 'All gates passed' : 'Needs fixes';
+let activeCategory = 'all';
 
-  $('token-pct').textContent = t.pct + '%';
-  const meter = $('token-meter');
-  meter.setAttribute('aria-valuenow', String(t.pct));
-  const fill = $('token-fill');
-  fill.style.setProperty('--ratio', String(t.pct / 100));
-  fill.dataset.bad = String(t.bad > 0);
-  $('token-line').textContent = t.refs + ' color references, ' + t.bad + ' hardcoded';
+function computeSummary() {
+  if (!REPORT || typeof REPORT !== 'object') {
+    return { valid: false };
+  }
+  const syntax = REPORT.syntax || {};
+  const checker = String(syntax.checker || 'not run').trim();
+  const checkerRan = checker.length > 0 && !/^not\s+run\b/i.test(checker);
+  const syntaxErrors = Math.max(0, Number(syntax.errors) || 0);
 
-  $('syntax-pct').textContent = t.syntaxOk ? '100% pass' : REPORT.syntax.errors + ' errors';
-  $('syntax-line').textContent = REPORT.syntax.files + ' files · ' + REPORT.syntax.checker;
-  $('slop-count').textContent = String(t.removed);
-  $('slop-line').textContent = 'lines of comment, guard, cast and helper slop removed';
-
-  $('regex-line').textContent = 'rg -n "' + REPORT.tokens.regex + '" src';
-  const tbody = $('token-rows');
-  REPORT.tokens.files.forEach((f) => {
-    const tr = document.createElement('tr');
-    const name = node('td', 'mono', f.name + (f.note ? ' (' + f.note + ')' : ''));
-    tr.append(name, node('td', 'num', String(f.refs)), node('td', 'num', String(f.hardcoded)));
-    tbody.appendChild(tr);
+  const rawFiles = (REPORT.tokens && Array.isArray(REPORT.tokens.files)) ? REPORT.tokens.files : [];
+  // Exclude token definition files from denominator so definitions do not inflate score (PRM-11)
+  const componentFiles = rawFiles.filter((f) => {
+    const fname = String(f.file || f.name || '');
+    return f.note !== 'definitions' && !/tokens\.css$/i.test(fname);
   });
+
+  const totalRefs = componentFiles.reduce((s, f) => s + Math.max(0, Number(f.refs) || 0), 0);
+  const hardcoded = componentFiles.reduce((s, f) => s + Math.max(0, Number(f.hardcoded) || 0), 0);
+  const tokenPct = totalRefs === 0
+    ? (hardcoded === 0 ? 100 : 0)
+    : Math.max(0, Math.round(((totalRefs - hardcoded) / totalRefs) * 100));
+
+  const openSlop = Math.max(0, Number(REPORT.openSlop) || 0);
+  const openGotchas = Math.max(0, Number(REPORT.openGotchas) || 0);
+  const remainingSlop = openSlop + openGotchas;
+
+  const syntaxSlot = !checkerRan
+    ? '[Syntax: Not Run]'
+    : '[Syntax: ' + syntaxErrors + (syntaxErrors === 1 ? ' Error]' : ' Errors]');
+  const tokenSlot = '[Tokens: ' + tokenPct + '% Validated]';
+  const slopSlot = remainingSlop === 0 ? '[Slop: Scrubbed]' : '[Slop: ' + remainingSlop + ' Remaining]';
+
+  const allClean = checkerRan && syntaxErrors === 0 && hardcoded === 0 && remainingSlop === 0;
+  const prefix = allClean ? '✓ VibeCraft QA' : '! VibeCraft QA';
+  const stamp = prefix + ' · ' + syntaxSlot + ' · ' + tokenSlot + ' · ' + slopSlot;
+
+  return {
+    valid: true,
+    checker,
+    checkerRan,
+    syntaxErrors,
+    componentFiles,
+    totalRefs,
+    hardcoded,
+    tokenPct,
+    remainingSlop,
+    allClean,
+    stamp
+  };
 }
 
-function renderHunks(filter) {
-  const host = $('hunks');
-  host.textContent = '';
-  const shown = REPORT.diffs.filter((d) => filter === 'all' || d.category === filter);
-  if (shown.length === 0) {
-    host.appendChild(node('p', 'empty', 'Nothing was scrubbed in this category.'));
+function makeCard(label, value, detail, badgeCls, badgeText) {
+  const box = document.createElement('div');
+  box.className = 'panel';
+  const top = document.createElement('div');
+  top.style.display = 'flex';
+  top.style.justifyContent = 'space-between';
+  top.style.alignItems = 'center';
+  top.style.gap = '6px';
+  const lbl = document.createElement('span');
+  lbl.className = 'muted';
+  lbl.style.fontSize = '0.82rem';
+  lbl.textContent = label;
+  top.appendChild(lbl);
+  if (badgeText) {
+    const b = document.createElement('span');
+    b.className = badgeCls;
+    b.textContent = badgeText;
+    top.appendChild(b);
+  }
+  box.appendChild(top);
+  const val = document.createElement('div');
+  val.className = 'kpi-val mono';
+  val.textContent = value;
+  box.appendChild(val);
+  const sub = document.createElement('p');
+  sub.className = 'muted';
+  sub.style.fontSize = '0.78rem';
+  sub.textContent = detail;
+  box.appendChild(sub);
+  return box;
+}
+
+function renderDiffs() {
+  const diffs = Array.isArray(REPORT && REPORT.diffs) ? REPORT.diffs : [];
+  const filterRow = $('filter-row');
+  const diffList = $('diff-list');
+  filterRow.replaceChildren();
+  diffList.replaceChildren();
+
+  const presentCats = ['all', ...new Set(diffs.map((d) => d.category || 'style'))];
+  presentCats.forEach((cat) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'chip-btn';
+    btn.setAttribute('aria-pressed', cat === activeCategory ? 'true' : 'false');
+    btn.textContent = CATEGORY_LABELS[cat] || cat;
+    btn.addEventListener('click', () => {
+      activeCategory = cat;
+      renderDiffs();
+    });
+    filterRow.appendChild(btn);
+  });
+
+  const visible = activeCategory === 'all' ? diffs : diffs.filter((d) => (d.category || 'style') === activeCategory);
+  if (visible.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = diffs.length === 0
+      ? 'Zero repair diffs needed; code passed all static checks on the first pass.'
+      : 'No repair hunks in this category.';
+    diffList.appendChild(empty);
     return;
   }
-  shown.forEach((d) => {
-    const hunk = node('div', 'hunk');
-    const head = node('div', 'hunk-head');
-    head.append(node('span', 'mono', d.file), node('span', 'muted', CATEGORY_LABELS[d.category]));
-    const code = node('pre', 'code');
-    d.lines.forEach((l) => {
-      const row = node('div', 'line ' + l.t);
-      const mark = node('span', 'mark', l.t === 'del' ? '-' : l.t === 'add' ? '+' : ' ');
-      const label = l.t === 'del' ? 'removed: ' : l.t === 'add' ? 'added: ' : '';
-      if (label) mark.setAttribute('aria-label', label.trim());
-      row.append(mark, node('span', '', l.s));
-      code.appendChild(row);
+
+  visible.forEach((d) => {
+    const card = document.createElement('article');
+    card.className = 'diff-card';
+    const head = document.createElement('div');
+    head.className = 'diff-head';
+    const fileSpan = document.createElement('span');
+    fileSpan.className = 'mono';
+    fileSpan.style.fontSize = '0.82rem';
+    fileSpan.textContent = d.file || 'unknown-file';
+    const catSpan = document.createElement('span');
+    catSpan.className = 'tag tag-inferred';
+    catSpan.textContent = CATEGORY_LABELS[d.category] || d.category || 'Repair';
+    head.appendChild(fileSpan);
+    head.appendChild(catSpan);
+    card.appendChild(head);
+
+    if (d.why || d.reason) {
+      const why = document.createElement('p');
+      why.className = 'muted';
+      why.style.padding = '8px 14px 0 14px';
+      why.style.fontSize = '0.82rem';
+      why.textContent = d.why || d.reason;
+      card.appendChild(why);
+    }
+
+    const pre = document.createElement('pre');
+    pre.className = 'diff-pre';
+    pre.tabIndex = 0;
+    const lines = Array.isArray(d.lines)
+      ? d.lines
+      : [
+          ...(d.before ? String(d.before).split('\n').map((s) => ({ t: 'del', s })) : []),
+          ...(d.after ? String(d.after).split('\n').map((s) => ({ t: 'add', s })) : [])
+        ];
+    lines.forEach((ln) => {
+      const span = document.createElement('span');
+      const prefix = ln.t === 'del' ? '- ' : ln.t === 'add' ? '+ ' : '  ';
+      span.className = ln.t === 'del' ? 'line-del' : ln.t === 'add' ? 'line-add' : 'line-ctx';
+      span.textContent = prefix + (ln.s || '');
+      pre.appendChild(span);
     });
-    hunk.append(head, code, node('p', 'reason', d.reason));
-    host.appendChild(hunk);
+    card.appendChild(pre);
+    diffList.appendChild(card);
   });
 }
 
-function renderFilters() {
-  const host = $('filters');
-  const present = ['all', ...new Set(REPORT.diffs.map((d) => d.category))];
-  present.forEach((key, i) => {
-    const label = node('label', 'chip');
-    const input = document.createElement('input');
-    input.type = 'radio';
-    input.name = 'category';
-    input.value = key;
-    input.checked = i === 0;
-    input.addEventListener('change', () => renderHunks(key));
-    label.append(input, node('span', '', CATEGORY_LABELS[key]));
-    host.appendChild(label);
-  });
-}
-
-function renderFixes() {
-  const host = $('fixes');
-  REPORT.fixes.forEach((f) => {
-    const li = node('li', 'fix');
-    const check = node('span', 'check', '✓');
-    check.setAttribute('aria-hidden', 'true');
-    const body = node('div', 'grid gap-1');
-    body.append(node('h3', '', f.title), node('p', 'muted', f.detail));
-    li.append(check, body);
-    host.appendChild(li);
-  });
-}
-
-function legacyCopy(text) {
-  const area = document.createElement('textarea');
-  area.value = text;
-  area.setAttribute('readonly', '');
-  area.style.position = 'fixed';
-  area.style.opacity = '0';
-  document.body.appendChild(area);
-  area.select();
-  let ok = false;
-  try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
-  area.remove();
-  return ok;
-}
-
-async function copyText(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (error) {
-    return legacyCopy(text);
+function renderReport() {
+  const s = computeSummary();
+  if (!s.valid) {
+    $('stamp-banner').textContent = 'Error: REPORT object is missing or invalid.';
+    return;
   }
-}
 
-async function copyWithFeedback(text, message) {
-  const ok = await copyText(text);
-  const status = $('status');
-  const fallback = $('fallback');
-  window.clearTimeout(statusTimer);
-  if (ok) {
-    status.textContent = message;
-    fallback.hidden = true;
-    statusTimer = window.setTimeout(() => { status.textContent = ''; }, 3500);
+  $('report-title').textContent = REPORT.project || 'QA Audit Report';
+  $('verdict-line').textContent = s.allClean
+    ? 'All compiler, token, gotcha, and anti-slop gates passed.'
+    : !s.checkerRan
+      ? 'Static checks evaluated; compiler check was not run in this environment.'
+      : 'Action required: unresolved findings remain open.';
+  $('stamp-banner').textContent = s.stamp;
+
+  const kpi = $('kpi-grid');
+  kpi.replaceChildren();
+  kpi.appendChild(
+    makeCard(
+      'Syntax & Types',
+      s.checkerRan ? String(s.syntaxErrors) + ' err' : 'Not Run',
+      s.checker,
+      !s.checkerRan ? 'tag tag-warn' : s.syntaxErrors === 0 ? 'tag tag-verified' : 'tag tag-danger',
+      !s.checkerRan ? 'Not Run' : s.syntaxErrors === 0 ? 'Pass' : 'Blocked'
+    )
+  );
+  kpi.appendChild(
+    makeCard(
+      'Token Adherence',
+      s.tokenPct + '%',
+      s.hardcoded + ' hardcoded across ' + s.totalRefs + ' styled refs',
+      s.hardcoded === 0 ? 'tag tag-verified' : 'tag tag-danger',
+      s.hardcoded === 0 ? 'Validated' : s.hardcoded + ' Violations'
+    )
+  );
+  kpi.appendChild(
+    makeCard(
+      'Open Slop & Gotchas',
+      String(s.remainingSlop),
+      (Array.isArray(REPORT.diffs) ? REPORT.diffs.length : 0) + ' automated repairs applied',
+      s.remainingSlop === 0 ? 'tag tag-verified' : 'tag tag-warn',
+      s.remainingSlop === 0 ? 'Scrubbed' : 'Needs Review'
+    )
+  );
+
+  renderDiffs();
+
+  const tfRoot = $('token-files');
+  tfRoot.replaceChildren();
+  if (s.componentFiles.length === 0) {
+    tfRoot.appendChild(Object.assign(document.createElement('p'), { className: 'muted', textContent: 'No styled component files recorded.' }));
   } else {
-    status.textContent = 'Clipboard is blocked here. Copy the selected text below.';
-    fallback.value = text;
-    fallback.hidden = false;
-    fallback.focus();
-    fallback.select();
+    s.componentFiles.forEach((f) => {
+      const row = document.createElement('div');
+      row.className = 'file-row';
+      const nameEl = document.createElement('span');
+      nameEl.className = 'mono';
+      nameEl.textContent = f.file || f.name || 'file';
+      const bad = Math.max(0, Number(f.hardcoded) || 0);
+      const statEl = document.createElement('span');
+      statEl.className = bad === 0 ? 'tag tag-verified' : 'tag tag-danger';
+      statEl.textContent = bad === 0 ? (f.refs || 0) + ' refs · clean' : bad + ' hardcoded';
+      row.appendChild(nameEl);
+      row.appendChild(statEl);
+      tfRoot.appendChild(row);
+    });
+  }
+
+  const gfRoot = $('gotcha-fixes');
+  gfRoot.replaceChildren();
+  const gotchaList = Array.isArray(REPORT.gotchas)
+    ? REPORT.gotchas
+    : Array.isArray(REPORT.fixes)
+      ? REPORT.fixes.map((x) => ({ issue: x.title, mitigation: x.detail, verified: true }))
+      : [];
+  if (gotchaList.length === 0) {
+    gfRoot.appendChild(Object.assign(document.createElement('p'), { className: 'muted', textContent: 'No gotcha items recorded.' }));
+  } else {
+    gotchaList.forEach((g) => {
+      const item = document.createElement('div');
+      item.style.paddingBlock = '8px';
+      item.style.borderBlockEnd = '1px solid var(--border)';
+      const top = document.createElement('div');
+      top.style.display = 'flex';
+      top.style.justifyContent = 'space-between';
+      top.style.gap = '8px';
+      const title = document.createElement('strong');
+      title.style.fontSize = '0.85rem';
+      title.textContent = g.issue || 'Gotcha';
+      const badge = document.createElement('span');
+      badge.className = g.verified === false ? 'tag tag-danger' : 'tag tag-verified';
+      badge.textContent = g.verified === false ? 'Open' : 'Verified';
+      top.appendChild(title);
+      top.appendChild(badge);
+      item.appendChild(top);
+      const detail = document.createElement('p');
+      detail.className = 'muted';
+      detail.style.fontSize = '0.8rem';
+      detail.style.marginBlockStart = '4px';
+      detail.textContent = (g.mitigation || '') + (g.file ? ' (' + g.file + ')' : '');
+      item.appendChild(detail);
+      gfRoot.appendChild(item);
+    });
   }
 }
 
-renderSummary();
-renderFilters();
-renderHunks('all');
-renderFixes();
-$('stamp').textContent = stampText();
-$('copy-stamp').addEventListener('click', () => copyWithFeedback(stampText(), 'Audit stamp copied.'));
-$('copy-report').addEventListener('click', () => copyWithFeedback(reportText(), 'Full report copied.'));
+$('copy-stamp-btn').addEventListener('click', () => {
+  const s = computeSummary();
+  copyWithFallback(s.valid ? s.stamp : 'QA report invalid', $('copy-stamp-btn'), 'Copied stamp ✓');
+});
+
+$('download-json-btn').addEventListener('click', () => {
+  const s = computeSummary();
+  const out = JSON.stringify({ stamp: s.stamp, report: REPORT }, null, 2) + '\n';
+  downloadBlob('qa-report.json', out, 'application/json;charset=utf-8');
+});
+
+renderReport();
 </script>
 </body>
 </html>
