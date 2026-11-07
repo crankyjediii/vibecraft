@@ -1,0 +1,16 @@
+{
+  "_comment": "Opt-in VibeCraft PostToolUse hook (disabled by default). Copy to hooks/hooks.json or merge into .claude/settings.local.json if you want automatic VC001..VC018 checks whenever Claude writes UI or TypeScript files.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/audit/cli.js\" --min-severity error ."
+          }
+        ]
+      }
+    ]
+  }
+}

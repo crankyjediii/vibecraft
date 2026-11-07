@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "vibecraft",
+  "owner": {
+    "name": "Jimmy Mullen"
+  },
+  "metadata": {
+    "description": "Self-hosted Claude Code plugin marketplace for VibeCraft, a gated four-phase design and full-stack engineering studio.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "vibecraft",
+      "source": "./",
+      "description": "Gated four-phase design and full-stack engineering studio for Claude Code and Claude Desktop: stack matrix, WCAG-verified token studio, architecture lock, and 18-rule zero-slop audit.",
+      "version": "1.0.0",
+      "license": "MIT"
+    }
+  ]
+}

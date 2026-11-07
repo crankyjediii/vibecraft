@@ -1,242 +1,192 @@
 #!/usr/bin/env bash
-# VibeCraft installer for macOS and Linux.
-# Merges the VibeCraft MCP servers into Claude Desktop's config and installs the
-# VibeCraft skill into Claude Code (~/.claude/skills/vibecraft).
+# VibeCraft cross-platform installer for macOS and Linux (Bash 3.2+ compatible).
+#
+# Configures pinned MCP servers in Claude Desktop (`claude_desktop_config.json`)
+# and installs the progressive-loading standalone skill bundle (`~/.claude/skills/vibecraft`).
+# For Claude Code native plugin installs, run inside Claude Code:
+#   /plugin install vibecraft --marketplace crankyjediii/vibecraft
+
 set -euo pipefail
+umask 077
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TIMESTAMP="$(date +%Y%m%d%H%M%S)-$$"
-
-ASSUME_YES=0
+YES=0
 DRY_RUN=0
-DO_DESKTOP=1
-DO_CLI=1
+UNINSTALL=0
+CHECK=0
+NO_DESKTOP=0
+NO_CLI=0
+WORKSPACE_DIR=""
 
 usage() {
-  cat <<'USAGE'
+  cat <<'EOF'
 Usage: ./install.sh [options]
 
-  -y, --yes        Accept defaults, never prompt (backups on, ~/Projects used)
-      --dry-run    Show what would change and write nothing
-      --no-desktop Skip the Claude Desktop MCP config merge
-      --no-cli     Skip the Claude Code skill install
-  -h, --help       Show this help
+Options:
+  -y, --yes              Run non-interactively using safe defaults
+      --dry-run          Preview planned changes without writing files
+      --check            Verify installation health and exit 0 (ok) or 1 (missing/invalid)
+      --uninstall        Remove vibecraft-* MCP entries and ~/.claude/skills/vibecraft
+      --no-desktop       Skip Claude Desktop claude_desktop_config.json merge
+      --no-cli           Skip standalone ~/.claude/skills/vibecraft installation
+      --workspace <dir>  Workspace directory exposed to vibecraft-filesystem MCP
+  -h, --help             Show this help text
 
 Environment overrides:
-  CLAUDE_DESKTOP_CONFIG    Path to claude_desktop_config.json
-  CLAUDE_SKILLS_DIR        Claude Code skills directory (default ~/.claude/skills)
-  VIBECRAFT_PROJECTS_DIR   Folder the filesystem server may access (default ~/Projects)
-  BRAVE_API_KEY            Enables the Brave Search server without a prompt
-USAGE
+  CLAUDE_DESKTOP_CONFIG    Custom path to claude_desktop_config.json
+  CLAUDE_SKILLS_DIR        Custom base directory for standalone skills
+  VIBECRAFT_WORKSPACE_DIR  Default workspace folder (default: $HOME/Projects)
+  VIBECRAFT_TARBALL_URL    Release tarball URL when piped via curl | bash
+EOF
 }
 
-while [ $# -gt 0 ]; do
+while [ "$#" -gt 0 ]; do
   case "$1" in
-    -y|--yes) ASSUME_YES=1 ;;
-    --dry-run) DRY_RUN=1 ;;
-    --no-desktop) DO_DESKTOP=0 ;;
-    --no-cli) DO_CLI=0 ;;
-    -h|--help) usage; exit 0 ;;
-    *) echo "Unknown option: $1" >&2; usage >&2; exit 64 ;;
+    -y|--yes)
+      YES=1
+      ;;
+    --dry-run)
+      DRY_RUN=1
+      ;;
+    --uninstall)
+      UNINSTALL=1
+      ;;
+    --check)
+      CHECK=1
+      ;;
+    --no-desktop)
+      NO_DESKTOP=1
+      ;;
+    --no-cli)
+      NO_CLI=1
+      ;;
+    --workspace)
+      if [ "$#" -lt 2 ] || [ -z "${2:-}" ]; then
+        printf 'Error: --workspace requires a directory path.\n' >&2
+        exit 1
+      fi
+      WORKSPACE_DIR="$2"
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      printf 'Error: unknown option "%s". Run with --help for usage.\n' "$1" >&2
+      exit 1
+      ;;
   esac
   shift
 done
 
-say() { printf '%s\n' "$*"; }
-warn() { printf 'warning: %s\n' "$*" >&2; }
-die() { printf 'error: %s\n' "$*" >&2; exit 1; }
-
-ask_yes() {
-  local question="$1" default="$2" reply
-  if [ "$ASSUME_YES" -eq 1 ] || [ ! -t 0 ]; then
-    [ "$default" = "y" ]
-    return
-  fi
-  read -r -p "$question " reply || reply=""
-  reply="${reply:-$default}"
-  case "$reply" in
-    [Yy]*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-
-[ -n "${HOME:-}" ] || die "HOME is not set."
-
-case "$(uname -s)" in
-  Darwin) DEFAULT_CONFIG="$HOME/Library/Application Support/Claude/claude_desktop_config.json" ;;
-  Linux) DEFAULT_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/Claude/claude_desktop_config.json" ;;
-  *) die "Unsupported OS: $(uname -s). Use macOS or Linux, or follow the manual steps in README.md." ;;
-esac
-
-CONFIG_PATH="${CLAUDE_DESKTOP_CONFIG:-$DEFAULT_CONFIG}"
-SKILLS_ROOT="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
-SKILL_DEST="$SKILLS_ROOT/vibecraft"
-
-for required in system_prompt.md claude_desktop_config.json skills templates/generative-ui; do
-  [ -e "$SCRIPT_DIR/$required" ] || die "Missing $required next to install.sh. Run it from a complete copy of the repo."
-done
-
-say "VibeCraft installer"
-say "  OS:              $(uname -s)"
-say "  Desktop config:  $CONFIG_PATH"
-say "  Claude Code dir: $SKILL_DEST"
-[ "$DRY_RUN" -eq 1 ] && say "  Mode:            dry run, nothing will be written"
-say ""
-
-DESKTOP_RESULT="skipped"
-CLI_RESULT="skipped"
-BACKUP_PATH=""
-BRAVE_STATE="not configured"
-
-if [ "$DO_DESKTOP" -eq 1 ]; then
-  command -v node >/dev/null 2>&1 || die "Node.js 18 or newer is required to merge the Desktop config. Install it from https://nodejs.org and re-run."
-  command -v npx >/dev/null 2>&1 || warn "npx not found: the filesystem and Brave servers will not start until Node.js is installed."
-  command -v uvx >/dev/null 2>&1 || warn "uvx not found: the fetch server needs uv (macOS: brew install uv; Linux: https://docs.astral.sh/uv/)."
-
-  PROJECTS_DIR="${VIBECRAFT_PROJECTS_DIR:-$HOME/Projects}"
-  if [ -z "${VIBECRAFT_PROJECTS_DIR:-}" ] && [ "$ASSUME_YES" -eq 0 ] && [ -t 0 ]; then
-    read -r -p "Folder Claude may read and write [$PROJECTS_DIR]: " reply || reply=""
-    PROJECTS_DIR="${reply:-$PROJECTS_DIR}"
-  fi
-  case "$PROJECTS_DIR" in
-    "~") PROJECTS_DIR="$HOME" ;;
-    "~/"*) PROJECTS_DIR="$HOME/${PROJECTS_DIR#"~/"}" ;;
-  esac
-  case "$PROJECTS_DIR" in
-    /*) ;;
-    *) die "Folder must be an absolute path: $PROJECTS_DIR" ;;
-  esac
-  if [ ! -d "$PROJECTS_DIR" ]; then
-    if ask_yes "$PROJECTS_DIR does not exist. Create it? [Y/n]" y; then
-      [ "$DRY_RUN" -eq 1 ] && say "[dry run] would create $PROJECTS_DIR" || mkdir -p "$PROJECTS_DIR"
-    else
-      warn "The filesystem server will fail to start until $PROJECTS_DIR exists."
-    fi
-  fi
-
-  BRAVE_KEY="${BRAVE_API_KEY:-}"
-  if [ -z "$BRAVE_KEY" ] && [ "$ASSUME_YES" -eq 0 ] && [ -t 0 ]; then
-    read -r -s -p "Brave Search API key for live research (Enter to skip): " BRAVE_KEY || BRAVE_KEY=""
-    printf '\n'
-  fi
-  [ -n "$BRAVE_KEY" ] && BRAVE_STATE="configured" || BRAVE_STATE="skipped (no key)"
-
-  if [ -f "$CONFIG_PATH" ]; then
-    if ask_yes "Back up the existing Claude Desktop config first? [Y/n]" y; then
-      BACKUP_PATH="$CONFIG_PATH.bak-$TIMESTAMP"
-      if [ "$DRY_RUN" -eq 1 ]; then
-        say "[dry run] would copy config to $BACKUP_PATH"
-      else
-        cp -p "$CONFIG_PATH" "$BACKUP_PATH"
-        say "Backed up to $BACKUP_PATH"
-      fi
-    else
-      warn "Continuing without a backup."
-    fi
-  fi
-
-  MERGE_JS="$(mktemp "${TMPDIR:-/tmp}/vibecraft-merge.XXXXXX")"
-  trap 'rm -f "$MERGE_JS"' EXIT
-  cat > "$MERGE_JS" <<'NODE'
-const fs = require('node:fs');
-const path = require('node:path');
-const [templatePath, targetPath, projectsDir, dryRun] = process.argv.slice(2);
-const braveKey = process.env.VC_BRAVE_KEY || '';
-
-const expand = (text) =>
-  text.replace(/\$\{(\w+)\}/g, (_, name) => (name === 'BRAVE_API_KEY' ? braveKey : process.env[name] || ''));
-
-const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
-let current = {};
-if (fs.existsSync(targetPath)) {
-  const raw = fs.readFileSync(targetPath, 'utf8');
-  if (raw.trim()) {
-    try {
-      current = JSON.parse(raw);
-    } catch (error) {
-      console.error('Existing config is not valid JSON, left untouched: ' + targetPath);
-      process.exit(2);
-    }
-  }
-}
-if (typeof current !== 'object' || current === null || Array.isArray(current)) {
-  console.error('Existing config is not a JSON object, left untouched: ' + targetPath);
-  process.exit(2);
-}
-
-const servers = { ...(current.mcpServers || {}) };
-const added = [];
-const skipped = [];
-for (const [name, def] of Object.entries(template.mcpServers)) {
-  const env = def.env ? Object.fromEntries(Object.entries(def.env).map(([k, v]) => [k, expand(v)])) : undefined;
-  if (env && Object.values(env).some((v) => v === '')) {
-    skipped.push(name);
-    continue;
-  }
-  const args = (def.args || []).map((arg) => (arg === '${HOME}/Projects' ? projectsDir : expand(arg)));
-  servers[name] = env ? { ...def, args, env } : { ...def, args };
-  added.push(name);
-}
-
-const out = JSON.stringify({ ...current, mcpServers: servers }, null, 2) + '\n';
-if (dryRun === '1') {
-  console.log(braveKey ? out.split(braveKey).join('***') : out);
-} else {
-  fs.mkdirSync(path.dirname(targetPath), { recursive: true });
-  const tmp = targetPath + '.tmp-' + process.pid;
-  fs.writeFileSync(tmp, out, { mode: 0o600 });
-  fs.renameSync(tmp, targetPath);
-}
-console.log('MERGED ' + added.join(','));
-console.log('SKIPPED ' + skipped.join(','));
-NODE
-  MERGE_OUT="$(VC_BRAVE_KEY="$BRAVE_KEY" node "$MERGE_JS" "$SCRIPT_DIR/claude_desktop_config.json" "$CONFIG_PATH" "$PROJECTS_DIR" "$DRY_RUN")" || die "Could not merge the Desktop config. Nothing was changed${BACKUP_PATH:+; backup is at $BACKUP_PATH}."
-
-  printf '%s\n' "$MERGE_OUT" | grep -v -e '^MERGED ' -e '^SKIPPED ' || true
-  MERGED_LIST="$(printf '%s\n' "$MERGE_OUT" | sed -n 's/^MERGED //p')"
-  DESKTOP_RESULT="servers: ${MERGED_LIST:-none}"
+if [ "$NO_DESKTOP" -eq 1 ] && [ "$NO_CLI" -eq 1 ]; then
+  printf 'Nothing selected (--no-desktop and --no-cli both passed).\n'
+  exit 0
 fi
 
-if [ "$DO_CLI" -eq 1 ]; then
-  case "$SKILL_DEST" in
-    */vibecraft) ;;
-    *) die "Refusing to manage unexpected skill path: $SKILL_DEST" ;;
-  esac
-  if [ "$DRY_RUN" -eq 1 ]; then
-    say "[dry run] would install the skill to $SKILL_DEST"
+if ! command -v node >/dev/null 2>&1; then
+  printf 'Error: Node.js (>= 18) is required on PATH. Install from https://nodejs.org\n' >&2
+  exit 1
+fi
+
+NODE_MAJOR="$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || printf '0')"
+if [ "${NODE_MAJOR:-0}" -lt 18 ]; then
+  printf 'Error: Node.js >= 18 is required (found %s).\n' "$(node -v 2>/dev/null || printf 'unknown')" >&2
+  exit 1
+fi
+
+TMP_FETCH_DIR=""
+cleanup() {
+  if [ -n "$TMP_FETCH_DIR" ] && [ -d "$TMP_FETCH_DIR" ]; then
+    rm -rf "$TMP_FETCH_DIR"
+  fi
+}
+trap cleanup EXIT INT TERM
+
+# Resolve repository root safely even when piped via `curl -fsSL ... | bash` (`SEC-08`)
+SCRIPT_SOURCE="${BASH_SOURCE[0]:-}"
+REPO_DIR=""
+if [ -n "$SCRIPT_SOURCE" ] && [ -f "$SCRIPT_SOURCE" ]; then
+  CANDIDATE_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+  if [ -f "$CANDIDATE_DIR/scripts/lib/installer-core.mjs" ] && [ -f "$CANDIDATE_DIR/claude_desktop_config.json" ]; then
+    REPO_DIR="$CANDIDATE_DIR"
+  fi
+fi
+
+if [ -z "$REPO_DIR" ]; then
+  if ! command -v curl >/dev/null 2>&1 || ! command -v tar >/dev/null 2>&1; then
+    printf 'Error: curl and tar are required when running install.sh without a local repository checkout.\n' >&2
+    exit 1
+  fi
+  TARBALL_URL="${VIBECRAFT_TARBALL_URL:-https://github.com/crankyjediii/vibecraft/archive/refs/tags/v1.0.0.tar.gz}"
+  TMP_FETCH_DIR="$(mktemp -d "${TMPDIR:-/tmp}/vibecraft-install.XXXXXXXX")"
+  chmod 700 "$TMP_FETCH_DIR"
+  printf 'Downloading VibeCraft bundle from %s ...\n' "$TARBALL_URL"
+  curl -fsSL "$TARBALL_URL" -o "$TMP_FETCH_DIR/vibecraft.tar.gz"
+  tar -xzf "$TMP_FETCH_DIR/vibecraft.tar.gz" -C "$TMP_FETCH_DIR"
+  for d in "$TMP_FETCH_DIR"/*; do
+    if [ -d "$d" ] && [ -f "$d/scripts/lib/installer-core.mjs" ]; then
+      REPO_DIR="$d"
+      break
+    fi
+  done
+  if [ -z "$REPO_DIR" ]; then
+    printf 'Error: downloaded archive did not contain scripts/lib/installer-core.mjs.\n' >&2
+    exit 1
+  fi
+fi
+
+# Confirm interactively only when mutating state without --yes and attached to a TTY
+if [ "$YES" -eq 0 ] && [ "$DRY_RUN" -eq 0 ] && [ "$CHECK" -eq 0 ]; then
+  ACTION_LABEL="install VibeCraft"
+  if [ "$UNINSTALL" -eq 1 ]; then
+    ACTION_LABEL="uninstall VibeCraft"
+  fi
+  if [ -t 0 ]; then
+    printf 'Proceed to %s? [Y/n] ' "$ACTION_LABEL"
+    read -r REPLY || REPLY=""
+    case "$REPLY" in
+      ""|[Yy]|[Yy][Ee][Ss])
+        ;;
+      *)
+        printf 'Aborted.\n'
+        exit 0
+        ;;
+    esac
   else
-    if [ -e "$SKILL_DEST" ]; then
-      mv "$SKILL_DEST" "$SKILL_DEST.bak-$TIMESTAMP"
-      say "Moved the previous install to $SKILL_DEST.bak-$TIMESTAMP"
-    fi
-    mkdir -p "$SKILL_DEST/skills" "$SKILL_DEST/templates/generative-ui" "$SKILL_DEST/tests"
-    {
-      printf '%s\n' '---'
-      printf '%s\n' 'name: vibecraft'
-      printf '%s\n' 'description: Autonomous vibecoding studio. Use when the user wants to build an app or product from an idea ("build me ...", "vibecode ..."), or asks for a stack comparison, brand and theme picker, architecture diagrams, or a QA audit. Runs a 4-phase gated pipeline (Scout, Artisan, Architect, Builder and Auditor), replies in at most 5 lines, and puts everything else in artifacts.'
-      printf '%s\n' '---'
-      printf '\n'
-      cat "$SCRIPT_DIR/system_prompt.md"
-    } > "$SKILL_DEST/SKILL.md"
-    cp "$SCRIPT_DIR"/skills/*.md "$SKILL_DEST/skills/"
-    cp "$SCRIPT_DIR"/templates/generative-ui/*.html "$SKILL_DEST/templates/generative-ui/"
-    cp "$SCRIPT_DIR/tests/audit_rules_test.js" "$SKILL_DEST/tests/"
+    printf 'Non-interactive stdin detected without --yes; proceeding only if --yes is supplied.\n' >&2
+    printf 'Re-run with "--yes" (for example: curl -fsSL ... | bash -s -- --yes).\n' >&2
+    exit 1
   fi
-  CLI_RESULT="$SKILL_DEST"
 fi
 
-say ""
-say "VibeCraft install summary"
-say "  Claude Desktop MCP config: $DESKTOP_RESULT"
-[ -n "$BACKUP_PATH" ] && say "  Config backup:             $BACKUP_PATH"
-say "  Brave Search:              $BRAVE_STATE"
-say "  Claude Code skill:         $CLI_RESULT"
-say ""
-say "Next steps"
-say "  1. Restart Claude Desktop so it loads the MCP servers."
-say "  2. Claude Desktop: create a Project, paste system_prompt.md into its Instructions,"
-say "     and upload skills/*.md and templates/generative-ui/*.html to Project Knowledge."
-say "  3. Claude Code: start a session and describe an app, or type /vibecraft."
-say "  4. Check the rules locally any time with: node tests/audit_rules_test.js"
-[ "$DRY_RUN" -eq 1 ] && say "  (dry run: no files were written)"
-exit 0
+CORE_ARGS=(--repo-root "$REPO_DIR")
+if [ "$DRY_RUN" -eq 1 ]; then
+  CORE_ARGS+=(--dry-run)
+fi
+if [ "$UNINSTALL" -eq 1 ]; then
+  CORE_ARGS+=(--uninstall)
+fi
+if [ "$CHECK" -eq 1 ]; then
+  CORE_ARGS+=(--check)
+fi
+if [ "$NO_DESKTOP" -eq 1 ]; then
+  CORE_ARGS+=(--no-desktop)
+fi
+if [ "$NO_CLI" -eq 1 ]; then
+  CORE_ARGS+=(--no-cli)
+fi
+if [ -n "$WORKSPACE_DIR" ]; then
+  CORE_ARGS+=(--workspace "$WORKSPACE_DIR")
+fi
+
+node "$REPO_DIR/scripts/lib/installer-core.mjs" "${CORE_ARGS[@]}"
+
+if [ "$CHECK" -eq 0 ] && [ "$UNINSTALL" -eq 0 ] && [ "$DRY_RUN" -eq 0 ]; then
+  if ! command -v uvx >/dev/null 2>&1; then
+    printf 'Note: optional "uvx" CLI not found on PATH (needed only for vibecraft-fetch MCP server).\n'
+    printf '      Install uv later if desired: curl -LsSf https://astral.sh/uv/install.sh | sh\n'
+  fi
+  printf 'Note: set BRAVE_API_KEY in your shell environment if you use vibecraft-brave-search.\n'
+  printf 'Done. Run "node scripts/doctor.mjs" (or "/vibecraft:doctor" in Claude Code) to verify.\n'
+fi

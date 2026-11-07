@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "vibecraft-filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem@2.2.0",
+        "."
+      ]
+    },
+    "vibecraft-brave-search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@brave/brave-search-mcp-server@2.1.4"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      }
+    },
+    "vibecraft-fetch": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "mcp-server-fetch==2026.11.4",
+        "mcp-server-fetch"
+      ]
+    }
+  }
+}

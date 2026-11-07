@@ -1,0 +1,23 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "vibecraft",
+  "version": "1.0.0",
+  "description": "Gated four-phase design and full-stack engineering studio for Claude Code and Claude Desktop: stack matrix, WCAG-verified token studio, architecture lock, and 18-rule zero-slop audit.",
+  "author": {
+    "name": "Jimmy Mullen",
+    "url": "https://github.com/crankyjediii"
+  },
+  "homepage": "https://github.com/crankyjediii/vibecraft",
+  "repository": "https://github.com/crankyjediii/vibecraft",
+  "license": "MIT",
+  "icon": "./.claude-plugin/icon.png",
+  "keywords": [
+    "design-system",
+    "ui-ux",
+    "architecture",
+    "code-audit",
+    "wcag",
+    "generative-ui",
+    "claude-code-plugin"
+  ]
+}
