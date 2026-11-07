@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>VibeCraft Stack Matrix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --bg-primary: #09090b;
+  --bg-surface: #18181b;
+  --bg-raised: #27272a;
+  --fg-primary: #ededef;
+  --fg-muted: #9a9aa5;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #5e6ad2;
+  --accent-fg: #fafafa;
+  --success: #4ade80;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --info: #22d3ee;
+  --radius: 8px;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #fbfbfa;
+    --bg-surface: #f4f4f1;
+    --bg-raised: #e9e9e5;
+    --fg-primary: #18181b;
+    --fg-muted: #52525b;
+    --border: rgba(24, 24, 27, 0.12);
+    --accent: #4f58b8;
+    --accent-fg: #fafafa;
+    --success: #15803d;
+    --warn: #a16207;
+    --danger: #b91c1c;
+    --info: #0e7490;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+.grid > * { min-width: 0; }
+html { color-scheme: light dark; }
+body { margin: 0; background-color: var(--bg-primary); color: var(--fg-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.55; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+h1, h2, h3, p, ul { margin: 0; }
+body h1 { font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+body h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
+body h3 { font-size: 20px; font-weight: 600; line-height: 1.2; }
+.mono { font-family: var(--font-mono); }
+.num { font-variant-numeric: tabular-nums; }
+.muted { color: var(--fg-muted); }
+
+.option {
+  position: relative; isolation: isolate;
+  display: grid; gap: 20px; align-content: start; padding: 24px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
+}
+.option:hover { background-color: var(--bg-raised); }
+.option:active { transform: translateY(1px); }
+.option:has(input:checked) { border-color: var(--accent); }
+.option:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.indicator {
+  position: absolute; top: 20px; right: 20px;
+  width: 20px; height: 20px; border-radius: 9999px;
+  border: 2px solid var(--border);
+  display: grid; place-items: center;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+}
+.indicator::after { content: ""; width: 8px; height: 8px; border-radius: 9999px; background-color: var(--accent-fg); transform: scale(0); transition: transform 150ms ease-out; }
+.option:has(input:checked) .indicator { background-color: var(--accent); border-color: var(--accent); }
+.option:has(input:checked) .indicator::after { transform: scale(1); }
+
+.badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); color: var(--fg-muted); }
+.badge-pick { color: var(--accent-fg); background-color: var(--accent); border-color: var(--accent); }
+.tag { font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; }
+.tag-verified { color: var(--success); }
+.tag-inferred { color: var(--info); }
+.tag-gotcha { color: var(--warn); }
+
+.row { display: grid; gap: 6px; padding-top: 16px; border-top: 1px solid var(--border); }
+.row-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.row-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
+.big { font-size: 28px; font-weight: 600; line-height: 1.1; }
+.bar { height: 6px; border-radius: 9999px; background-color: var(--bg-raised); overflow: hidden; }
+.option:hover .bar { background-color: var(--bg-primary); }
+.bar-fill { height: 100%; border-radius: 9999px; background-color: var(--accent); transform-origin: left center; transform: scaleX(var(--ratio, 0)); transition: transform 250ms ease-out; }
+.dots { display: inline-flex; gap: 4px; }
+.dot { width: 10px; height: 10px; border-radius: 9999px; border: 1px solid var(--fg-muted); }
+.dot.on { background-color: var(--success); border-color: var(--success); }
+.gotcha { padding: 12px; border-radius: var(--radius); border: 1px solid var(--border); background-color: var(--bg-primary); display: grid; gap: 6px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 44px; padding: 0 20px; border-radius: var(--radius);
+  border: 1px solid transparent; background-color: var(--accent); color: var(--accent-fg);
+  font: inherit; font-weight: 600; cursor: pointer;
+  transition: background-color 150ms ease-out, transform 150ms ease-out, opacity 150ms ease-out;
+}
+.btn:hover:not(:disabled) { background-color: color-mix(in srgb, var(--accent) 86%, var(--fg-primary)); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-ghost { background-color: transparent; color: var(--fg-primary); border-color: var(--border); }
+.btn-ghost:hover:not(:disabled) { background-color: var(--bg-raised); }
+.status { font-size: 13px; color: var(--fg-muted); min-height: 20px; }
+.fallback { width: 100%; padding: 12px; background-color: var(--bg-surface); color: var(--fg-primary); border: 1px solid var(--border); border-radius: var(--radius); font-family: var(--font-mono); font-size: 13px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="min-h-screen px-4 py-6 md:px-8 md:py-10">
+  <header class="grid gap-3 pb-8 max-w-3xl">
+    <h2>Phase 1 of 4 · Research Scout</h2>
+    <h1 id="headline"></h1>
+    <p class="muted" id="subline"></p>
+  </header>
+
+  <form id="matrix" class="grid gap-4 lg:grid-cols-3" aria-label="Candidate stacks">
+    <fieldset class="contents">
+      <legend class="sr-only">Choose a stack</legend>
+    </fieldset>
+  </form>
+
+  <footer class="mt-8 grid gap-3 max-w-3xl">
+    <div class="flex flex-wrap items-center gap-3">
+      <button type="button" class="btn" id="proceed-btn">Select Stack &amp; Proceed</button>
+      <button type="button" class="btn btn-ghost" id="gotchas-btn">Copy gotchas only</button>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </div>
+    <textarea class="fallback" id="fallback" rows="9" readonly hidden aria-label="Selection text (copy manually)"></textarea>
+    <p class="muted" style="font-size:13px">Tags: <span class="tag tag-verified">[Verified]</span> from official docs or benchmarks, <span class="tag tag-inferred">[Inferred]</span> architectural deduction, <span class="tag tag-gotcha">[Gotcha]</span> known edge case.</p>
+  </footer>
+</div>
+
+<script>
+// Scout agent: replace CONCEPT and STACKS with the researched data for the user's idea. Keep exactly 3 stacks.
+const CONCEPT = {
+  headline: 'Voice memo app that transcribes and groups notes by project',
+  subline: 'Three stacks scouted for local-first capture, on-device transcription and project grouping. The pick is marked.'
+};
+
+const STACKS = [
+  {
+    id: 'local-first',
+    name: 'Local-First Studio',
+    stack: 'Vite + React 19 + PGlite + Tailwind',
+    pick: true,
+    why: 'Capture and search work with no network, and transcripts never leave the device.',
+    latencyMs: 40, latencyTag: 'inferred', latencyNote: 'Local SQL query to paint, no network hop.',
+    offline: 3, offlineLabel: 'Full offline', offlineTag: 'verified', offlineNote: 'PGlite runs Postgres in WASM and persists to IndexedDB.',
+    cost: '$0 hosting', costNote: 'Static host (Cloudflare Pages or Netlify free tier). Low maintenance.', costTag: 'inferred',
+    gotcha: 'IndexedDB quota eviction: Safari can purge script-written storage after 7 days without a visit.',
+    mitigation: 'Call navigator.storage.persist() on first record and add a one-tap export to a file.'
+  },
+  {
+    id: 'saas',
+    name: 'Cloud SaaS',
+    stack: 'Next.js 15 App Router + Supabase + Drizzle + Stripe',
+    pick: false,
+    why: 'Best if sync across devices, teams and paid plans matter more than offline use.',
+    latencyMs: 220, latencyTag: 'inferred', latencyNote: 'Round trip to a regional API plus database.',
+    offline: 1, offlineLabel: 'Needs a service worker', offlineTag: 'inferred', offlineNote: 'Reads can be cached; writes need a queue you build.',
+    cost: '~$45 per month', costNote: 'Supabase Pro plus a Vercel Pro seat. Medium maintenance.', costTag: 'inferred',
+    gotcha: 'Vercel Functions cap request bodies at 4.5 MB, so long memos fail if uploaded through a route handler.',
+    mitigation: 'Upload straight to Supabase Storage with signed URLs and send only the file key to your API.'
+  },
+  {
+    id: 'desktop',
+    name: 'Desktop Utility',
+    stack: 'Tauri v2 + Rust core + SolidJS',
+    pick: false,
+    why: 'Global hotkey capture and native audio, with a small installed footprint.',
+    latencyMs: 12, latencyTag: 'inferred', latencyNote: 'In-process IPC between the webview and Rust.',
+    offline: 3, offlineLabel: 'Full offline', offlineTag: 'verified', offlineNote: 'Everything runs locally; SQLite via the Tauri SQL plugin.',
+    cost: '$99 per year signing', costNote: 'Apple Developer Program plus notarization and an updater. High maintenance.', costTag: 'verified',
+    gotcha: 'macOS needs NSMicrophoneUsageDescription in Info.plist; without it the mic prompt never appears and recording returns silence.',
+    mitigation: 'Add the key in tauri.conf.json bundle settings and test a signed build, not only tauri dev.'
+  }
+];
+
+const root = document.getElementById('matrix');
+const status = document.getElementById('status');
+const fallback = document.getElementById('fallback');
+let selectedId = (STACKS.find((s) => s.pick) || STACKS[0]).id;
+let statusTimer = 0;
+
+const TAG_TEXT = { verified: '[Verified]', inferred: '[Inferred]', gotcha: '[Gotcha]' };
+
+function node(tag, className, text) {
+  const n = document.createElement(tag);
+  if (className) n.className = className;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+
+function tagEl(kind) {
+  return node('span', 'tag tag-' + kind, TAG_TEXT[kind]);
+}
+
+function rowEl(label, tag) {
+  const row = node('div', 'row');
+  const head = node('div', 'row-head');
+  head.append(node('span', 'row-label', label), tagEl(tag));
+  row.appendChild(head);
+  return row;
+}
+
+function buildCard(item, maxLatency) {
+  const label = node('label', 'option');
+
+  const input = document.createElement('input');
+  input.type = 'radio';
+  input.name = 'stack';
+  input.value = item.id;
+  input.className = 'sr-only';
+  input.checked = item.id === selectedId;
+  input.addEventListener('change', () => { selectedId = item.id; clearStatus(); });
+
+  const top = node('div', 'grid gap-2');
+  const badges = node('div', 'flex flex-wrap gap-2');
+  if (item.pick) badges.appendChild(node('span', 'badge badge-pick', 'Scout pick'));
+  top.append(badges, node('h3', '', item.name), node('p', 'mono muted', item.stack), node('p', '', item.why));
+
+  const perf = rowEl('Performance', item.latencyTag);
+  const big = node('p', 'big num', item.latencyMs + ' ms');
+  const bar = node('div', 'bar');
+  const fill = node('div', 'bar-fill');
+  fill.style.setProperty('--ratio', String(item.latencyMs / maxLatency));
+  bar.appendChild(fill);
+  perf.append(big, bar, node('p', 'muted', item.latencyNote));
+
+  const off = rowEl('Offline and persistence', item.offlineTag);
+  const dots = node('span', 'dots');
+  dots.setAttribute('role', 'img');
+  dots.setAttribute('aria-label', item.offline + ' of 3');
+  for (let i = 1; i <= 3; i += 1) dots.appendChild(node('span', 'dot' + (i <= item.offline ? ' on' : '')));
+  const offHead = node('div', 'flex items-center gap-3');
+  offHead.append(dots, node('span', '', item.offlineLabel));
+  off.append(offHead, node('p', 'muted', item.offlineNote));
+
+  const cost = rowEl('Hosting cost and upkeep', item.costTag);
+  cost.append(node('p', 'big', item.cost), node('p', 'muted', item.costNote));
+
+  const risk = rowEl('Risk flag', 'gotcha');
+  const box = node('div', 'gotcha');
+  box.append(node('p', '', item.gotcha), node('p', 'muted', 'Fix: ' + item.mitigation));
+  risk.appendChild(box);
+
+  label.append(input, node('span', 'indicator'), top, perf, off, cost, risk);
+  return label;
+}
+
+function render() {
+  document.getElementById('headline').textContent = CONCEPT.headline;
+  document.getElementById('subline').textContent = CONCEPT.subline;
+  const maxLatency = Math.max(...STACKS.map((s) => s.latencyMs));
+  const fieldset = root.querySelector('fieldset');
+  STACKS.forEach((item) => fieldset.appendChild(buildCard(item, maxLatency)));
+}
+
+function selectionText() {
+  const item = STACKS.find((s) => s.id === selectedId);
+  return [
+    'VIBECRAFT PICK · Phase 1 · Research Scout',
+    'Stack: ' + item.stack + ' (' + item.name + ')',
+    'Why: ' + item.why,
+    'Performance: ' + item.latencyMs + ' ms ' + TAG_TEXT[item.latencyTag],
+    'Offline: ' + item.offlineLabel + ' ' + TAG_TEXT[item.offlineTag],
+    'Cost: ' + item.cost + ' ' + TAG_TEXT[item.costTag],
+    '[Gotcha] ' + item.gotcha,
+    'Fix: ' + item.mitigation,
+    '',
+    'Continue: start Phase 2 (Brand Artisan) with this stack.'
+  ].join('\n');
+}
+
+function gotchaText() {
+  const item = STACKS.find((s) => s.id === selectedId);
+  return '[Gotcha] ' + item.gotcha + '\nFix: ' + item.mitigation;
+}
+
+function legacyCopy(text) {
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.appendChild(area);
+  area.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+  area.remove();
+  return ok;
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (error) {
+    return legacyCopy(text);
+  }
+}
+
+function clearStatus() {
+  status.textContent = '';
+  fallback.hidden = true;
+}
+
+async function copyWithFeedback(text, successMessage) {
+  const ok = await copyText(text);
+  window.clearTimeout(statusTimer);
+  if (ok) {
+    status.textContent = successMessage;
+    fallback.hidden = true;
+    statusTimer = window.setTimeout(clearStatus, 4000);
+  } else {
+    status.textContent = 'Clipboard is blocked here. Copy the selected text below.';
+    fallback.value = text;
+    fallback.hidden = false;
+    fallback.focus();
+    fallback.select();
+  }
+}
+
+render();
+document.getElementById('proceed-btn').addEventListener('click', () => copyWithFeedback(selectionText(), 'Copied. Paste it into the chat to start Phase 2.'));
+document.getElementById('gotchas-btn').addEventListener('click', () => copyWithFeedback(gotchaText(), 'Gotcha and fix copied.'));
+</script>
+</body>
+</html>

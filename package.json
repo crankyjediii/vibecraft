@@ -1,0 +1,14 @@
+{
+  "name": "vibecraft-claude-plugin",
+  "version": "1.0.0",
+  "description": "VibeCraft: an autonomous vibecoding studio for Claude Desktop and Claude Code.",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node tests/audit_rules_test.js",
+    "install:plugin": "bash install.sh"
+  }
+}

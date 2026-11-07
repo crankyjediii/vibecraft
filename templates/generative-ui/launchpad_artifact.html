@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>VibeCraft Launchpad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --bg-primary: #09090b;
+  --bg-surface: #18181b;
+  --bg-raised: #27272a;
+  --fg-primary: #ededef;
+  --fg-muted: #9a9aa5;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #5e6ad2;
+  --accent-fg: #fafafa;
+  --success: #4ade80;
+  --danger: #f87171;
+  --radius: 8px;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-primary: #fbfbfa;
+    --bg-surface: #f4f4f1;
+    --bg-raised: #e9e9e5;
+    --fg-primary: #18181b;
+    --fg-muted: #52525b;
+    --border: rgba(24, 24, 27, 0.12);
+    --accent: #4f58b8;
+    --accent-fg: #fafafa;
+    --success: #15803d;
+    --danger: #b91c1c;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+.grid > * { min-width: 0; }
+html { color-scheme: light dark; }
+body { margin: 0; background-color: var(--bg-primary); color: var(--fg-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.55; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+h1, h2, h3, p, ul { margin: 0; }
+body h1 { font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+body h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
+body h3 { font-size: 16px; font-weight: 600; line-height: 1.3; }
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--fg-muted); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 36px; padding: 0 14px; border-radius: var(--radius);
+  border: 1px solid var(--border); background-color: transparent; color: var(--fg-primary);
+  font: inherit; font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out, opacity 150ms ease-out;
+}
+.btn:hover:not(:disabled) { background-color: var(--bg-raised); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background-color: var(--accent); border-color: var(--accent); color: var(--accent-fg); height: 40px; padding: 0 18px; font-size: 14px; }
+.btn-primary:hover:not(:disabled) { background-color: color-mix(in srgb, var(--accent) 86%, var(--fg-primary)); }
+.btn[data-state="done"] { color: var(--success); border-color: var(--success); }
+.btn[data-state="manual"] { color: var(--danger); border-color: var(--danger); }
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab {
+  position: relative; height: 44px; padding: 0 16px; border: 0; background-color: transparent; color: var(--fg-muted);
+  font: inherit; font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap;
+  transition: color 150ms ease-out;
+}
+.tab::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; background-color: var(--accent); transform: scaleX(0); transition: transform 150ms ease-out; }
+.tab:hover { color: var(--fg-primary); }
+.tab[aria-selected="true"] { color: var(--fg-primary); }
+.tab[aria-selected="true"]::after { transform: scaleX(1); }
+.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: var(--radius); }
+
+.block { background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+.block-meta { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.lang { font-family: var(--font-mono); font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--fg-muted); }
+.code { margin: 0; padding: 14px; font-family: var(--font-mono); font-size: 13px; line-height: 1.65; overflow-x: auto; white-space: pre; tab-size: 2; }
+.code-wrap { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.diagram-host { padding: 20px; overflow-x: auto; display: grid; place-items: center; min-height: 200px; }
+.diagram-host svg { max-width: 100%; height: auto; }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid var(--border); border-radius: var(--radius); background-color: var(--bg-surface); }
+.seg label { position: relative; }
+.seg input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.seg span { display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--fg-muted); transition: background-color 150ms ease-out, color 150ms ease-out; }
+.seg input:checked + span { background-color: var(--accent); color: var(--accent-fg); }
+.seg input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.logo-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 24px; padding: 24px; }
+.logo-cell { display: grid; gap: 8px; justify-items: start; }
+.logo-box { aspect-ratio: 1; }
+.logo-box svg { width: 100%; height: 100%; display: block; }
+.bg-check { background-color: var(--bg-primary); }
+
+.status { font-size: 13px; color: var(--fg-muted); min-height: 20px; }
+.tool-tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 9999px; border: 1px solid var(--border); color: var(--fg-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="min-h-screen px-4 py-6 md:px-8 md:py-10">
+  <header class="flex flex-wrap items-end justify-between gap-4 pb-6">
+    <div class="grid gap-2">
+      <h2 id="phase">Phase 4 of 4 · Launchpad</h2>
+      <h1 id="title"></h1>
+      <p class="muted" id="tagline"></p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <button type="button" class="btn btn-primary" id="copy-all">Copy All</button>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Project deliverables" id="tablist"></div>
+  <main class="pt-6" id="panels"></main>
+</div>
+
+<script>
+// Builder agent: replace LAUNCH with this project's deliverables. Keep the keys; the tabs are built from them.
+const LAUNCH = {
+  name: 'Murmur',
+  tagline: 'Voice memos that transcribe themselves and file under the right project.',
+  readme: [
+    '# Murmur',
+    '',
+    'Record a voice memo, get a transcript, and find it under the project it belongs to.',
+    'Everything runs on your device: audio and text stay in a local Postgres (PGlite).',
+    '',
+    '## Run it',
+    '',
+    'npm install',
+    'npm run dev',
+    '',
+    '## How it is built',
+    '',
+    '- Vite + React 19 + TypeScript (strict)',
+    '- PGlite for storage, persisted to IndexedDB',
+    '- Whisper (WASM) in a web worker for transcription',
+    '- Tailwind with design tokens in src/styles/tokens.css',
+    '',
+    '## Good to know',
+    '',
+    '- Safari may evict site storage after 7 days without a visit. Murmur asks for persistent storage on the first memo and offers a one-tap export.',
+    '- Close the AudioContext when the tab is hidden, or the mic indicator stays on.'
+  ].join('\n'),
+  commands: [
+    'npm create vite@latest murmur -- --template react-ts',
+    'cd murmur',
+    'npm install @electric-sql/pglite tailwindcss @tailwindcss/vite',
+    'npm install -D vitest @testing-library/react',
+    'npm run dev'
+  ].join('\n'),
+  tree: [
+    'murmur/',
+    '  src/',
+    '    components/   Recorder.tsx  MemoList.tsx  ProjectSidebar.tsx',
+    '    hooks/        useRecorder.ts  useTranscription.ts',
+    '    lib/          db.ts  projects.ts  types.ts',
+    '    workers/      transcribe.worker.ts',
+    '    styles/       tokens.css',
+    '  index.html'
+  ].join('\n'),
+  flow: [
+    'flowchart TD',
+    '  A([Open app]) --> B{Mic permission?}',
+    '  B -- granted --> C[Record memo]',
+    '  B -- denied --> D[Show permission help]',
+    '  C --> E[Save audio to local storage]',
+    '  E --> F[Transcribe in worker]',
+    '  F --> G{Project detected?}',
+    '  G -- yes --> H[Group under project]',
+    '  G -- no --> I[Ask: pick or create project]',
+    '  H --> J[Memo list]',
+    '  I --> J'
+  ].join('\n'),
+  sequence: [
+    'sequenceDiagram',
+    '  participant U as User',
+    '  participant UI as Recorder UI',
+    '  participant W as Transcribe Worker',
+    '  participant DB as PGlite',
+    '  U->>UI: Hold to record',
+    '  UI->>DB: insert memo (status: recording)',
+    '  UI-->>U: waveform and timer',
+    '  U->>UI: Release',
+    '  UI->>W: audio blob',
+    '  W-->>UI: text segments (streamed)',
+    '  UI->>DB: update memo (status: ready)',
+    '  DB-->>UI: memos grouped by project'
+  ].join('\n'),
+  contracts: [
+    'export type MemoStatus = "recording" | "transcribing" | "ready" | "failed";',
+    '',
+    'export interface Project {',
+    '  id: string;',
+    '  name: string;',
+    '  createdAt: string;',
+    '}',
+    '',
+    'export interface Memo {',
+    '  id: string;',
+    '  projectId: string | null;',
+    '  audioKey: string;',
+    '  durationMs: number;',
+    '  transcript: string | null;',
+    '  status: MemoStatus;',
+    '  createdAt: string;',
+    '}',
+    '',
+    'export type AsyncState<T> =',
+    '  | { kind: "idle" }',
+    '  | { kind: "loading" }',
+    '  | { kind: "success"; data: T }',
+    '  | { kind: "error"; error: Error };',
+    '',
+    'export function isReady(memo: Memo): memo is Memo & { transcript: string } {',
+    '  return memo.status === "ready" && memo.transcript !== null;',
+    '}'
+  ].join('\n'),
+  logo: [
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Murmur logo">',
+    '  <rect width="64" height="64" rx="14" style="fill:var(--accent)"/>',
+    '  <g fill="none" style="stroke:var(--accent-fg);stroke-width:6;stroke-linecap:round">',
+    '    <path d="M16 26v12"/>',
+    '    <path d="M27 18v28"/>',
+    '    <path d="M38 23v18"/>',
+    '  </g>',
+    '  <circle cx="50" cy="32" r="3.5" style="fill:var(--accent-fg)"/>',
+    '</svg>'
+  ].join('\n'),
+  midjourney: 'abstract app icon, three rounded vertical bars rising and falling in height followed by one round dot, acoustic resonance geometry, flat vector, solid indigo field, off-white mark, generous padding, centered, symmetrical balance, no microphone, no headphones --style raw --v 6 --ar 1:1 --no microphone, headphones, gradient, glow, text, 3d, shadow',
+  dalle: 'A flat vector app icon on a solid indigo rounded square. The mark is made of three thick off-white vertical bars with rounded ends, tall in the middle and shorter on the sides, followed by a single off-white dot to the right, like a voice fading out. Generous padding, centered, no gradients, no glow, no shadow, no text, and no microphone or headphone imagery. It must stay readable at 16 pixels.',
+  nextSteps: [
+    {
+      tool: 'Cursor',
+      title: 'Memo detail screen',
+      prompt: 'In the Murmur repo (Vite + React 19 + TypeScript strict + PGlite), add a MemoDetail route at /memo/:id. Show the audio player, the transcript with the segment under the playhead highlighted, and a project picker. Use only classes backed by tokens in src/styles/tokens.css (no hardcoded colors), design hover, focus-visible, disabled, loading and error states, and use the Memo and AsyncState types from src/lib/types.ts. Add a Vitest test for the loading and error states.'
+    },
+    {
+      tool: 'v0',
+      title: 'Project sidebar and empty state',
+      prompt: 'Design a left sidebar for a voice memo app listing projects with memo counts (tabular numbers), a "New project" row, and a collapsed state at 64px wide. Include the empty state for a project with no memos: a short line explaining that recordings appear here after transcription, and a primary "Record a memo" button. Dark zinc surfaces, hairline borders, one indigo accent, no gradients, no glows.'
+    },
+    {
+      tool: 'Claude',
+      title: 'Storage durability pass',
+      prompt: 'Review src/lib/db.ts for data-loss risks. Request navigator.storage.persist() after the first saved memo, surface the result in Settings, add a one-tap export of all memos and audio as a zip, and handle QuotaExceededError by telling the user what to export or delete. Do not add retries or fallbacks without a named failure. List what you changed and what you could not verify.'
+    }
+  ]
+};
+
+const $ = (id) => document.getElementById(id);
+let statusTimer = 0;
+let diagramKind = 'flow';
+
+function node(tag, className, text) {
+  const n = document.createElement(tag);
+  if (className) n.className = className;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+
+function legacyCopy(text) {
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.appendChild(area);
+  area.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+  area.remove();
+  return ok;
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (error) {
+    return legacyCopy(text);
+  }
+}
+
+function flashButton(btn, ok, idleLabel) {
+  btn.dataset.state = ok ? 'done' : 'manual';
+  btn.textContent = ok ? 'Copied' : 'Press Ctrl/Cmd+C';
+  window.setTimeout(() => {
+    delete btn.dataset.state;
+    btn.textContent = idleLabel;
+  }, 1800);
+}
+
+function selectContents(el) {
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
+function codeBlock(title, lang, text, wrap) {
+  if (!text) return null;
+  const block = node('section', 'block');
+  const head = node('div', 'block-head');
+  const meta = node('div', 'block-meta');
+  meta.append(node('h3', '', title), node('span', 'lang', lang));
+  const btn = node('button', 'btn', 'Copy');
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Copy ' + title);
+  const pre = node('pre', 'code' + (wrap ? ' code-wrap' : ''));
+  pre.textContent = text;
+  btn.addEventListener('click', async () => {
+    const ok = await copyText(text);
+    if (!ok) selectContents(pre);
+    flashButton(btn, ok, 'Copy');
+  });
+  head.append(meta, btn);
+  block.append(head, pre);
+  return block;
+}
+
+const DIAGRAM_KINDS = [['flow', 'User journey'], ['sequence', 'Lifecycle']];
+
+function gather(className, children) {
+  const kids = children.filter(Boolean);
+  if (kids.length === 0) return null;
+  const wrap = node('div', className);
+  wrap.append(...kids);
+  return wrap;
+}
+
+function buildDocs() {
+  const side = gather('grid gap-6 content-start', [codeBlock('Setup commands', 'bash', LAUNCH.commands), codeBlock('File tree', 'text', LAUNCH.tree)]);
+  return gather('grid gap-6 lg:grid-cols-[1.5fr_1fr]', [codeBlock('README.md', 'markdown', LAUNCH.readme, true), side]);
+}
+
+function buildArchitecture() {
+  const kinds = DIAGRAM_KINDS.filter(([key]) => LAUNCH[key]);
+  const contracts = codeBlock('TypeScript contracts', 'ts', LAUNCH.contracts);
+  if (kinds.length === 0) return gather('grid gap-6', [contracts]);
+  diagramKind = kinds[0][0];
+  const panel = node('div', 'grid gap-6');
+  const bar = node('div', 'flex flex-wrap items-center justify-between gap-3');
+  const seg = node('fieldset', 'seg border-0 m-0');
+  seg.appendChild(node('legend', 'sr-only', 'Diagram type'));
+  kinds.forEach(([key, label], i) => {
+    const l = node('label');
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'diagram';
+    input.value = key;
+    input.checked = i === 0;
+    input.addEventListener('change', () => { diagramKind = key; renderDiagram(); });
+    l.append(input, node('span', '', label));
+    seg.appendChild(l);
+  });
+  bar.appendChild(seg);
+
+  const diagram = node('section', 'block');
+  const head = node('div', 'block-head');
+  const meta = node('div', 'block-meta');
+  meta.append(node('h3', '', 'Diagram'), node('span', 'lang', 'mermaid'));
+  const btn = node('button', 'btn', 'Copy source');
+  btn.type = 'button';
+  btn.addEventListener('click', async () => {
+    const ok = await copyText(LAUNCH[diagramKind]);
+    flashButton(btn, ok, 'Copy source');
+  });
+  head.append(meta, btn);
+  const host = node('div', 'diagram-host');
+  host.id = 'diagram-host';
+  host.setAttribute('role', 'img');
+  host.setAttribute('aria-label', 'Rendered Mermaid diagram');
+  diagram.append(head, host);
+
+  if (kinds.length > 1) panel.appendChild(bar);
+  panel.appendChild(diagram);
+  if (contracts) panel.appendChild(contracts);
+  return panel;
+}
+
+function mermaidTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (name) => cs.getPropertyValue(name).trim();
+  return {
+    background: v('--bg-surface'),
+    primaryColor: v('--bg-raised'),
+    primaryTextColor: v('--fg-primary'),
+    primaryBorderColor: v('--accent'),
+    secondaryColor: v('--bg-raised'),
+    tertiaryColor: v('--bg-surface'),
+    lineColor: v('--fg-muted'),
+    textColor: v('--fg-primary'),
+    noteBkgColor: v('--bg-raised'),
+    noteTextColor: v('--fg-primary'),
+    actorBkg: v('--bg-raised'),
+    actorBorder: v('--accent'),
+    actorTextColor: v('--fg-primary'),
+    signalColor: v('--fg-muted'),
+    signalTextColor: v('--fg-primary'),
+    fontFamily: v('--font-sans')
+  };
+}
+
+let renderCount = 0;
+async function renderDiagram() {
+  const host = $('diagram-host');
+  if (!host) return;
+  const source = LAUNCH[diagramKind];
+  if (!window.mermaid) {
+    host.textContent = '';
+    host.appendChild(node('pre', 'code', source));
+    return;
+  }
+  try {
+    window.mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'strict', themeVariables: mermaidTheme() });
+    renderCount += 1;
+    const { svg } = await window.mermaid.render('vc-diagram-' + renderCount, source);
+    host.innerHTML = svg;
+  } catch (error) {
+    host.textContent = '';
+    host.appendChild(node('pre', 'code', source));
+  }
+}
+
+function buildAssets() {
+  const logos = node('section', 'block');
+  const head = node('div', 'block-head');
+  head.appendChild(node('h3', '', 'Logo at 16, 32, 64 and 512 px'));
+  logos.appendChild(head);
+  const row = node('div', 'logo-row bg-check');
+  [16, 32, 64, 512].forEach((size) => {
+    const cell = node('div', 'logo-cell');
+    const box = node('div', 'logo-box');
+    box.style.width = size === 512 ? 'min(512px, 100%)' : size + 'px';
+    box.innerHTML = LAUNCH.logo;
+    cell.append(box, node('span', 'muted mono', size + ' px'));
+    if (size === 512) cell.style.width = 'min(512px, 100%)';
+    row.appendChild(cell);
+  });
+  logos.appendChild(row);
+
+  const prompts = gather('grid gap-6 lg:grid-cols-2', [codeBlock('Midjourney v6 prompt', 'prompt', LAUNCH.midjourney, true), codeBlock('DALL-E 3 prompt', 'prompt', LAUNCH.dalle, true)]);
+  return gather('grid gap-6', [LAUNCH.logo ? logos : null, codeBlock('Logo SVG', 'svg', LAUNCH.logo), prompts]);
+}
+
+function buildNext() {
+  const cards = LAUNCH.nextSteps.filter((step) => step.prompt).map((step) =>
+    gather('grid gap-3 content-start', [node('span', 'tool-tag', 'For ' + step.tool), codeBlock(step.title, step.tool.toLowerCase(), step.prompt, true)])
+  );
+  return gather('grid gap-6 lg:grid-cols-3', cards);
+}
+
+const TABS = [
+  { key: 'docs', label: 'Documentation', build: buildDocs },
+  { key: 'architecture', label: 'Architecture', build: buildArchitecture },
+  { key: 'assets', label: 'Asset Prompts', build: buildAssets },
+  { key: 'next', label: 'Next Steps', build: buildNext }
+];
+
+function allText() {
+  const parts = [
+    ['README.md', LAUNCH.readme],
+    ['Setup commands', LAUNCH.commands],
+    ['File tree', LAUNCH.tree],
+    ['User journey (mermaid)', LAUNCH.flow],
+    ['Lifecycle (mermaid)', LAUNCH.sequence],
+    ['TypeScript contracts', LAUNCH.contracts],
+    ['Logo SVG', LAUNCH.logo],
+    ['Midjourney v6 prompt', LAUNCH.midjourney],
+    ['DALL-E 3 prompt', LAUNCH.dalle]
+  ];
+  LAUNCH.nextSteps.forEach((s) => parts.push(['Next step for ' + s.tool + ': ' + s.title, s.prompt]));
+  return LAUNCH.name + ' launchpad\n\n' + parts.filter(([, text]) => text).map(([title, text]) => '## ' + title + '\n\n' + text).join('\n\n');
+}
+
+function selectTab(key, focus) {
+  TABS.forEach((t) => {
+    const selected = t.key === key;
+    const tab = $('tab-' + t.key);
+    tab.setAttribute('aria-selected', String(selected));
+    tab.tabIndex = selected ? 0 : -1;
+    $('panel-' + t.key).hidden = !selected;
+    if (selected && focus) tab.focus();
+  });
+  if (key === 'architecture') renderDiagram();
+}
+
+function buildTabs() {
+  const list = $('tablist');
+  const panels = $('panels');
+  TABS.forEach((t) => { t.el = t.build(); });
+  TABS.splice(0, TABS.length, ...TABS.filter((t) => t.el));
+  TABS.forEach((t, i) => {
+    const tab = node('button', 'tab', t.label);
+    tab.type = 'button';
+    tab.id = 'tab-' + t.key;
+    tab.setAttribute('role', 'tab');
+    tab.setAttribute('aria-controls', 'panel-' + t.key);
+    tab.addEventListener('click', () => selectTab(t.key, false));
+    tab.addEventListener('keydown', (event) => {
+      const last = TABS.length - 1;
+      let next = -1;
+      if (event.key === 'ArrowRight') next = i === last ? 0 : i + 1;
+      else if (event.key === 'ArrowLeft') next = i === 0 ? last : i - 1;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = last;
+      if (next >= 0) { event.preventDefault(); selectTab(TABS[next].key, true); }
+    });
+    list.appendChild(tab);
+
+    const panel = node('div');
+    panel.id = 'panel-' + t.key;
+    panel.setAttribute('role', 'tabpanel');
+    panel.setAttribute('aria-labelledby', 'tab-' + t.key);
+    panel.appendChild(t.el);
+    panels.appendChild(panel);
+  });
+}
+
+async function copyAll() {
+  const ok = await copyText(allText());
+  const status = $('status');
+  window.clearTimeout(statusTimer);
+  status.textContent = ok ? 'Everything copied. Paste it into a new file or chat.' : 'Clipboard is blocked here. Use the Copy buttons on each block, or select the text.';
+  statusTimer = window.setTimeout(() => { status.textContent = ''; }, 4000);
+}
+
+$('phase').textContent = LAUNCH.phase || 'Phase 4 of 4 · Launchpad';
+$('title').textContent = LAUNCH.title || LAUNCH.name + ' is ready to launch';
+$('tagline').textContent = LAUNCH.tagline;
+buildTabs();
+selectTab(TABS[0].key, false);
+$('copy-all').addEventListener('click', copyAll);
+window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+  const panel = $('panel-architecture');
+  if (panel && !panel.hidden) renderDiagram();
+});
+</script>
+</body>
+</html>

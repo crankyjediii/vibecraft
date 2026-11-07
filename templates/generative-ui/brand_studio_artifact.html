@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>VibeCraft Brand Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:wght@500;600&display=swap">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root {
+  --bg-primary: #09090b;
+  --bg-surface: #18181b;
+  --bg-raised: #27272a;
+  --fg-primary: #ededef;
+  --fg-muted: #9a9aa5;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #5e6ad2;
+  --accent-2: #22d3ee;
+  --accent-fg: #fafafa;
+  --success: #4ade80;
+  --danger: #f87171;
+  --radius: 8px;
+  --radius-btn: 8px;
+  --font-sans: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Geist", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --blur: 0px;
+  --shape-opacity: 0;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+.grid > * { min-width: 0; }
+html { color-scheme: light dark; }
+body {
+  margin: 0;
+  background-color: var(--bg-primary);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  transition: background-color 200ms ease-out, color 200ms ease-out;
+}
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+body h1, body h2, body h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; letter-spacing: -0.01em; }
+body h1 { font-size: 28px; font-weight: 600; }
+body h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); }
+p { margin: 0; }
+.mono { font-family: var(--font-mono); }
+.num { font-variant-numeric: tabular-nums; }
+
+.surface {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  transition: background-color 200ms ease-out, border-color 200ms ease-out;
+}
+
+.pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 28px; padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background-color: var(--bg-surface);
+  font-size: 13px; font-weight: 500;
+}
+.pill-dot { width: 8px; height: 8px; border-radius: 9999px; background-color: var(--accent); }
+
+.card {
+  display: grid; gap: 8px; padding: 16px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out;
+}
+.card:hover { background-color: var(--bg-raised); }
+.card:active { transform: translateY(1px); }
+.card:has(input:checked) { border-color: var(--accent); background-color: var(--bg-raised); }
+.card:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.card-name { font-weight: 600; }
+.card-tag { color: var(--fg-muted); font-size: 13px; }
+.swatches { display: flex; gap: 4px; }
+.swatch { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 16px;
+  border-radius: var(--radius-btn);
+  border: 1px solid transparent;
+  font: inherit; font-weight: 600; font-size: 14px;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out, transform 150ms ease-out, opacity 150ms ease-out;
+}
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background-color: var(--accent); color: var(--accent-fg); }
+.btn-primary:hover:not(:disabled) { background-color: color-mix(in srgb, var(--accent) 86%, var(--fg-primary)); }
+.btn-secondary { background-color: transparent; color: var(--fg-primary); border-color: var(--border); }
+.btn-secondary:hover:not(:disabled) { background-color: var(--bg-raised); }
+.btn[data-loading="true"]::before {
+  content: ""; width: 14px; height: 14px; border-radius: 9999px;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: spin 700ms linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.field { display: grid; gap: 6px; }
+.label { font-size: 13px; font-weight: 500; }
+.input {
+  height: 40px; padding: 0 12px; width: 100%;
+  background-color: var(--bg-raised); color: var(--fg-primary);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  font: inherit;
+  transition: border-color 150ms ease-out, background-color 150ms ease-out;
+}
+.input::placeholder { color: var(--fg-muted); }
+.input:hover { border-color: var(--fg-muted); }
+.input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.help { font-size: 13px; color: var(--fg-muted); }
+.error { font-size: 13px; color: var(--danger); }
+
+.metric-value { font-family: var(--font-display); font-size: 36px; font-weight: 600; line-height: 1.1; }
+.chip { display: inline-flex; padding: 2px 8px; border-radius: 9999px; font-size: 12px; font-weight: 600; color: var(--success); background-color: color-mix(in srgb, var(--success) 14%, transparent); }
+
+.track { height: 8px; border-radius: 9999px; background-color: var(--bg-raised); overflow: hidden; }
+.fill { height: 100%; width: 100%; border-radius: 9999px; background-color: var(--accent-2); transform-origin: left center; transform: scaleX(var(--progress, 0)); transition: transform 250ms ease-out; }
+
+.dd { position: relative; display: inline-block; }
+.dd-list {
+  position: absolute; top: calc(100% + 6px); left: 0; min-width: 100%; margin: 0; padding: 4px; list-style: none;
+  background-color: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-overlay);
+  backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
+  opacity: 0; visibility: hidden; transform: translateY(-4px);
+  transition: opacity 150ms ease-in, transform 150ms ease-in, visibility 0s linear 150ms;
+}
+.dd.open .dd-list { opacity: 1; visibility: visible; transform: none; transition: opacity 150ms ease-out, transform 150ms ease-out, visibility 0s; }
+.dd-item { padding: 8px 12px; border-radius: calc(var(--radius) - 2px); cursor: pointer; font-size: 14px; white-space: nowrap; }
+.dd-item[aria-selected="true"] { font-weight: 600; }
+.dd-item:hover, .dd-item.active { background-color: var(--bg-raised); }
+
+.stage { position: relative; isolation: isolate; overflow: hidden; }
+.shape { position: absolute; z-index: -1; border-radius: 9999px; background-color: var(--accent); opacity: var(--shape-opacity); transition: opacity 200ms ease-out; }
+.shape-a { width: 220px; height: 220px; top: -60px; right: 8%; }
+.shape-b { width: 160px; height: 160px; bottom: -40px; left: 30%; background-color: var(--accent-2); }
+
+.token-row { display: grid; grid-template-columns: 20px max-content 1fr; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.token-row > :last-child { text-align: right; overflow-wrap: anywhere; }
+.token-chip { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border); }
+.toast { min-height: 20px; font-size: 13px; color: var(--fg-muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="min-h-screen px-4 py-6 md:px-8 md:py-10">
+  <header class="flex flex-wrap items-end justify-between gap-4 pb-8">
+    <div class="grid gap-2">
+      <h2>Phase 2 of 4 · Brand Artisan</h2>
+      <h1>Pick the look. Everything below re-themes live.</h1>
+    </div>
+    <span class="pill" aria-live="polite"><span class="pill-dot"></span><span id="active-pill">Active: Linear Dark</span></span>
+  </header>
+
+  <main class="grid gap-8 lg:grid-cols-[320px_1fr]">
+    <fieldset class="grid content-start gap-3 border-0 p-0 m-0">
+      <legend class="sr-only">Aesthetic archetype</legend>
+      <div id="cards" class="grid gap-3"></div>
+    </fieldset>
+
+    <div class="grid content-start gap-6">
+      <section class="surface stage p-5 md:p-8" aria-labelledby="preview-title">
+        <span class="shape shape-a"></span>
+        <span class="shape shape-b"></span>
+        <h2 id="preview-title" class="mb-6">Live preview · Voice memo app</h2>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <div class="surface p-5 grid gap-1">
+            <p class="help">Memos transcribed</p>
+            <p class="metric-value num">1,284</p>
+            <div class="flex items-center gap-2 pt-2"><span class="chip num">+12%</span><span class="help">vs. last week</span></div>
+          </div>
+
+          <div class="surface p-5 grid gap-3 content-start">
+            <div class="flex items-baseline justify-between">
+              <p class="label">Batch progress</p>
+              <p class="help num" id="progress-text">34 of 50 memos</p>
+            </div>
+            <div class="track" role="progressbar" aria-label="Batch progress" aria-valuemin="0" aria-valuemax="50" aria-valuenow="34" id="progress-track"><div class="fill" id="progress-fill"></div></div>
+            <div><button type="button" class="btn btn-primary" id="run-btn">Transcribe next batch</button></div>
+          </div>
+
+          <div class="surface p-5 grid gap-4 content-start">
+            <div class="field">
+              <label class="label" for="project-name">Project name</label>
+              <input class="input" id="project-name" type="text" value="Field recordings" autocomplete="off">
+              <p class="help">Memos are grouped under this name.</p>
+            </div>
+            <div class="field">
+              <label class="label" for="project-error">Existing project</label>
+              <input class="input" id="project-error" type="text" value="Studio sessions" aria-invalid="true" aria-describedby="project-error-msg" autocomplete="off">
+              <p class="error" id="project-error-msg" role="alert">Studio sessions already exists. Pick a different name.</p>
+            </div>
+          </div>
+
+          <div class="surface p-5 grid gap-4 content-start">
+            <p class="label">Grouping</p>
+            <div class="dd" id="dd">
+              <button type="button" class="btn btn-secondary" id="dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="dd-list">
+                <span id="dd-label">Group by project</span>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5l4 4 4-4"/></svg>
+              </button>
+              <ul class="dd-list" id="dd-list" role="listbox" tabindex="-1" aria-label="Grouping"></ul>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <button type="button" class="btn btn-secondary">Export audio</button>
+              <button type="button" class="btn btn-primary" disabled>Share transcript</button>
+            </div>
+            <p class="help">Share is disabled until a transcript finishes.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="surface p-5 md:p-8" aria-labelledby="tokens-title">
+        <h2 id="tokens-title" class="mb-4">Token sheet</h2>
+        <div id="token-sheet"></div>
+      </section>
+
+      <section class="flex flex-wrap items-center gap-4">
+        <button type="button" class="btn btn-primary" id="lock-btn">Lock in Linear Dark &amp; Continue</button>
+        <p class="toast" id="toast" role="status" aria-live="polite"></p>
+      </section>
+      <textarea id="fallback" class="input" rows="8" readonly hidden aria-label="Locked tokens (copy manually)" style="height:auto"></textarea>
+    </div>
+  </main>
+</div>
+
+<script>
+// @tokens:start
+const THEMES = {
+  linear: {
+    name: 'Linear Dark',
+    tagline: 'Deep zinc, indigo accent, hairline borders.',
+    'bg-primary': '#09090b', 'bg-surface': '#18181b', 'bg-raised': '#27272a',
+    'fg-primary': '#ededef', 'fg-muted': '#9a9aa5',
+    'border': 'rgba(255, 255, 255, 0.08)',
+    'accent': '#5e6ad2', 'accent-2': '#22d3ee', 'accent-fg': '#fafafa',
+    'success': '#4ade80', 'danger': '#f87171',
+    'radius': '8px', 'radius-btn': '8px',
+    'font-sans': '"Geist", "Inter", ui-sans-serif, system-ui, sans-serif',
+    'font-display': '"Geist", "Inter", ui-sans-serif, system-ui, sans-serif',
+    'font-mono': '"Geist Mono", ui-monospace, "SF Mono", Menlo, monospace',
+    'shadow-overlay': '0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.3)',
+    'blur': '0px', 'shape-opacity': '0'
+  },
+  editorial: {
+    name: 'Editorial Warmth',
+    tagline: 'Parchment, charcoal type, terracotta and forest.',
+    'bg-primary': '#fbfbfa', 'bg-surface': '#f4f1ea', 'bg-raised': '#ebe6da',
+    'fg-primary': '#1f1d1a', 'fg-muted': '#6b6459',
+    'border': 'rgba(31, 29, 26, 0.14)',
+    'accent': '#b4532a', 'accent-2': '#2f6b4f', 'accent-fg': '#fbfbfa',
+    'success': '#2f6b4f', 'danger': '#a33a2b',
+    'radius': '4px', 'radius-btn': '4px',
+    'font-sans': '"Inter", ui-sans-serif, system-ui, sans-serif',
+    'font-display': '"Source Serif 4", "Iowan Old Style", Georgia, serif',
+    'font-mono': '"JetBrains Mono", ui-monospace, Menlo, monospace',
+    'shadow-overlay': '0 8px 20px rgba(31, 29, 26, 0.14), 0 2px 4px rgba(31, 29, 26, 0.08)',
+    'blur': '0px', 'shape-opacity': '0'
+  },
+  brutalist: {
+    name: 'Cyber Brutalist',
+    tagline: 'Stark contrast, canary punch, square corners, mono type.',
+    'bg-primary': '#0c0c0c', 'bg-surface': '#141414', 'bg-raised': '#1f1f1f',
+    'fg-primary': '#f5f5f5', 'fg-muted': '#a3a3a3',
+    'border': 'rgba(245, 245, 245, 0.9)',
+    'accent': '#facc15', 'accent-2': '#f5f5f5', 'accent-fg': '#0c0c0c',
+    'success': '#a3e635', 'danger': '#fb7185',
+    'radius': '0px', 'radius-btn': '0px',
+    'font-sans': '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace',
+    'font-display': '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace',
+    'font-mono': '"JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace',
+    'shadow-overlay': '0 0 0 1px rgba(245, 245, 245, 0.9)',
+    'blur': '0px', 'shape-opacity': '0'
+  },
+  apple: {
+    name: 'Apple Clean',
+    tagline: 'Translucent glass, neutral grays, SF blue, pill buttons.',
+    'bg-primary': '#f5f5f7', 'bg-surface': 'rgba(255, 255, 255, 0.72)', 'bg-raised': 'rgba(255, 255, 255, 0.92)',
+    'fg-primary': '#1d1d1f', 'fg-muted': '#6e6e73',
+    'border': 'rgba(0, 0, 0, 0.08)',
+    'accent': '#0071e3', 'accent-2': '#34c759', 'accent-fg': '#ffffff',
+    'success': '#248a3d', 'danger': '#d70015',
+    'radius': '14px', 'radius-btn': '9999px',
+    'font-sans': '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif',
+    'font-display': '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif',
+    'font-mono': 'ui-monospace, "SF Mono", Menlo, monospace',
+    'shadow-overlay': '0 12px 32px rgba(0, 0, 0, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06)',
+    'blur': '20px', 'shape-opacity': '0.28'
+  }
+};
+// @tokens:end
+
+const TOKEN_KEYS = ['bg-primary', 'bg-surface', 'bg-raised', 'fg-primary', 'fg-muted', 'border', 'accent', 'accent-2', 'accent-fg', 'success', 'danger', 'radius', 'radius-btn', 'font-sans', 'font-display', 'font-mono', 'shadow-overlay', 'blur', 'shape-opacity'];
+const SWATCH_KEYS = ['bg-primary', 'bg-raised', 'accent', 'accent-2'];
+const COLOR_KEYS = new Set(['bg-primary', 'bg-surface', 'bg-raised', 'fg-primary', 'fg-muted', 'border', 'accent', 'accent-2', 'accent-fg', 'success', 'danger']);
+
+const root = document.documentElement;
+const el = (id) => document.getElementById(id);
+let current = 'linear';
+let resetTimer = 0;
+
+function buildCards() {
+  const host = el('cards');
+  Object.entries(THEMES).forEach(([key, theme]) => {
+    const label = document.createElement('label');
+    label.className = 'card';
+
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'archetype';
+    input.value = key;
+    input.className = 'sr-only';
+    input.checked = key === current;
+    input.addEventListener('change', () => applyTheme(key));
+
+    const swatches = document.createElement('span');
+    swatches.className = 'swatches';
+    SWATCH_KEYS.forEach((k) => {
+      const s = document.createElement('span');
+      s.className = 'swatch';
+      s.style.backgroundColor = theme[k];
+      swatches.appendChild(s);
+    });
+
+    const name = document.createElement('span');
+    name.className = 'card-name';
+    name.textContent = theme.name;
+    name.style.fontFamily = theme['font-display'];
+
+    const tag = document.createElement('span');
+    tag.className = 'card-tag';
+    tag.textContent = theme.tagline;
+
+    label.append(input, swatches, name, tag);
+    host.appendChild(label);
+  });
+}
+
+function renderTokenSheet(theme) {
+  const host = el('token-sheet');
+  host.textContent = '';
+  TOKEN_KEYS.forEach((k) => {
+    const row = document.createElement('div');
+    row.className = 'token-row';
+    const chip = document.createElement('span');
+    chip.className = 'token-chip';
+    if (COLOR_KEYS.has(k)) chip.style.backgroundColor = theme[k];
+    const name = document.createElement('span');
+    name.className = 'mono';
+    name.textContent = '--' + k;
+    const value = document.createElement('span');
+    value.className = 'mono help';
+    value.textContent = theme[k];
+    row.append(chip, name, value);
+    host.appendChild(row);
+  });
+}
+
+function applyTheme(key) {
+  const theme = THEMES[key];
+  current = key;
+  TOKEN_KEYS.forEach((k) => root.style.setProperty('--' + k, theme[k]));
+  el('active-pill').textContent = 'Active: ' + theme.name;
+  el('lock-btn').textContent = 'Lock in ' + theme.name + ' & Continue';
+  el('toast').textContent = '';
+  el('fallback').hidden = true;
+  renderTokenSheet(theme);
+}
+
+function lockText() {
+  const theme = THEMES[current];
+  const lines = TOKEN_KEYS.map((k) => '  --' + k + ': ' + theme[k] + ';');
+  return [
+    'VIBECRAFT LOCK · Phase 2 · Brand Artisan',
+    'Archetype: ' + theme.name,
+    '',
+    ':root {',
+    ...lines,
+    '}',
+    '',
+    'Rules: Craft 12 enforced, tokens only, no hardcoded colors in components.',
+    'Continue: start Phase 3 (System Architect).'
+  ].join('\n');
+}
+
+function legacyCopy(text) {
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.setAttribute('readonly', '');
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.appendChild(area);
+  area.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+  area.remove();
+  return ok;
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (error) {
+    return legacyCopy(text);
+  }
+}
+
+async function lockIn() {
+  const text = lockText();
+  const ok = await copyText(text);
+  const toast = el('toast');
+  const fallback = el('fallback');
+  if (ok) {
+    toast.textContent = 'Copied. Paste it into the chat to start Phase 3.';
+    fallback.hidden = true;
+  } else {
+    toast.textContent = 'Clipboard is blocked here. Copy the selected text below.';
+    fallback.value = text;
+    fallback.hidden = false;
+    fallback.focus();
+    fallback.select();
+  }
+  window.clearTimeout(resetTimer);
+  resetTimer = window.setTimeout(() => { if (ok) toast.textContent = ''; }, 4000);
+}
+
+const progress = { done: 34, total: 50 };
+function renderProgress() {
+  el('progress-fill').style.setProperty('--progress', String(progress.done / progress.total));
+  el('progress-track').setAttribute('aria-valuenow', String(progress.done));
+  el('progress-text').textContent = progress.done + ' of ' + progress.total + ' memos';
+  el('run-btn').textContent = progress.done >= progress.total ? 'Start a new batch' : 'Transcribe next batch';
+}
+
+function runBatch() {
+  const btn = el('run-btn');
+  if (progress.done >= progress.total) {
+    progress.done = 6;
+    renderProgress();
+    return;
+  }
+  btn.disabled = true;
+  btn.dataset.loading = 'true';
+  btn.textContent = 'Transcribing';
+  window.setTimeout(() => {
+    progress.done = Math.min(progress.total, progress.done + 8);
+    btn.disabled = false;
+    delete btn.dataset.loading;
+    renderProgress();
+  }, 1200);
+}
+
+function initDropdown() {
+  const options = ['Group by project', 'Group by date', 'Group by speaker'];
+  const wrap = el('dd');
+  const btn = el('dd-btn');
+  const list = el('dd-list');
+  let active = 0;
+  let selected = 0;
+
+  options.forEach((text, i) => {
+    const li = document.createElement('li');
+    li.className = 'dd-item';
+    li.setAttribute('role', 'option');
+    li.id = 'dd-opt-' + i;
+    li.textContent = text;
+    li.setAttribute('aria-selected', String(i === selected));
+    li.addEventListener('click', () => choose(i));
+    list.appendChild(li);
+  });
+
+  function setActive(i) {
+    active = (i + options.length) % options.length;
+    [...list.children].forEach((li, n) => li.classList.toggle('active', n === active));
+    list.setAttribute('aria-activedescendant', 'dd-opt-' + active);
+  }
+  function open() {
+    wrap.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+    setActive(selected);
+    list.focus();
+  }
+  function close(returnFocus) {
+    wrap.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+    if (returnFocus) btn.focus();
+  }
+  function choose(i) {
+    selected = i;
+    el('dd-label').textContent = options[i];
+    [...list.children].forEach((li, n) => li.setAttribute('aria-selected', String(n === i)));
+    close(true);
+  }
+
+  btn.addEventListener('click', () => (wrap.classList.contains('open') ? close(false) : open()));
+  list.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowDown') { event.preventDefault(); setActive(active + 1); }
+    else if (event.key === 'ArrowUp') { event.preventDefault(); setActive(active - 1); }
+    else if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choose(active); }
+    else if (event.key === 'Escape' || event.key === 'Tab') { close(event.key === 'Escape'); }
+  });
+  document.addEventListener('click', (event) => { if (!wrap.contains(event.target)) close(false); });
+}
+
+buildCards();
+applyTheme(current);
+renderProgress();
+initDropdown();
+el('run-btn').addEventListener('click', runBatch);
+el('lock-btn').addEventListener('click', lockIn);
+</script>
+</body>
+</html>
