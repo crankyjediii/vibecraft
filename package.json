@@ -1,14 +1,66 @@
 {
-  "name": "vibecraft-claude-plugin",
+  "name": "vibecraft",
   "version": "1.0.0",
-  "description": "VibeCraft: an autonomous vibecoding studio for Claude Desktop and Claude Code.",
-  "private": true,
+  "description": "User-gated four-phase software studio plugin and Generative UI artifact suite for Claude Code and Claude Desktop.",
   "license": "MIT",
-  "engines": {
-    "node": ">=18"
+  "author": "Jimmy Mullen (https://github.com/crankyjediii)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crankyjediii/vibecraft.git"
   },
+  "homepage": "https://github.com/crankyjediii/vibecraft#readme",
+  "bugs": {
+    "url": "https://github.com/crankyjediii/vibecraft/issues"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "claude-plugin",
+    "claude-desktop",
+    "mcp",
+    "design-tokens",
+    "wcag",
+    "static-analysis",
+    "sarif"
+  ],
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "bin": {
+    "vibecraft-audit": "./scripts/audit/cli.js",
+    "vibecraft-doctor": "./scripts/doctor.mjs"
+  },
+  "files": [
+    ".claude-plugin/",
+    ".mcp.json",
+    "claude_desktop_config.json",
+    "commands/",
+    "dist/",
+    "docs/architecture.md",
+    "docs/decisions/",
+    "docs/index.md",
+    "docs/interaction_guide.md",
+    "docs/release-process.md",
+    "docs/rules.md",
+    "docs/skill-authoring.md",
+    "hooks/",
+    "install.ps1",
+    "install.sh",
+    "scripts/",
+    "skills/",
+    "system_prompt.md",
+    "templates/"
+  ],
   "scripts": {
-    "test": "node tests/audit_rules_test.js",
+    "test": "node tests/audit_rules_test.js && node tests/lock_blocks.test.js && node tests/installer_e2e.test.js && node tests/docs_links.test.js",
+    "test:unit": "node tests/audit_rules_test.js && node tests/lock_blocks.test.js && node tests/installer_e2e.test.js",
+    "test:browser": "node scripts/verify-templates-browser.mjs",
+    "audit": "node scripts/audit/cli.js templates/generative-ui scripts .mcp.json claude_desktop_config.json package.json install.sh",
+    "audit:sarif": "node scripts/audit/cli.js templates/generative-ui scripts --sarif",
+    "build": "node scripts/build-templates.mjs && node scripts/audit/generate-docs.mjs && node scripts/build-dist.mjs",
+    "check:drift": "node scripts/build-templates.mjs --check && node scripts/audit/generate-docs.mjs --check && node scripts/build-dist.mjs --check",
+    "evals": "node evals/runner.mjs",
+    "doctor": "node scripts/doctor.mjs",
     "install:plugin": "bash install.sh"
   }
 }

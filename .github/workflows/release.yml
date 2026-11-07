@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish-release:
+    name: Verify & Publish GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Verify tests, audit, drift, and evals
+        run: |
+          npm test
+          npm run audit
+          npm run check:drift
+          npm run evals
+          shellcheck install.sh
+
+      - name: Stage release artifacts and SHA256SUMS.txt
+        run: |
+          mkdir -p release-assets
+          cp dist/vibecraft-desktop/vibecraft-skill.zip release-assets/vibecraft-skill.zip
+          (cd dist && zip -r ../release-assets/vibecraft-desktop-bundle.zip vibecraft-desktop)
+          (cd release-assets && sha256sum vibecraft-skill.zip vibecraft-desktop-bundle.zip > SHA256SUMS.txt)
+
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          node -e '
+            const fs = require("node:fs");
+            const ver = process.argv[1];
+            const md = fs.readFileSync("CHANGELOG.md", "utf8");
+            const esc = ver.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const re = new RegExp("## \\[" + esc + "\\][^\\n]*\\n([\\s\\S]*?)(?=\\n## \\[|$)");
+            const m = md.match(re);
+            const body = m ? m[1].trim() : "Release v" + ver;
+            fs.writeFileSync("release-notes.md", body + "\n", "utf8");
+          ' "$VERSION"
+
+      - name: Upload workflow artifact backup
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: vibecraft-release-${{ github.ref_name }}
+          path: release-assets/*
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
+        with:
+          body_path: release-notes.md
+          files: |
+            release-assets/vibecraft-skill.zip
+            release-assets/vibecraft-desktop-bundle.zip
+            release-assets/SHA256SUMS.txt
+          fail_on_unmatched_files: true

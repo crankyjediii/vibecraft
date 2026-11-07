@@ -1,103 +1,63 @@
-# VibeCraft architecture
+# System Architecture
 
-VibeCraft is instructions plus templates, not a server. Claude is the runtime. Five role files describe the work, four HTML templates carry the interface, and a small amount of tooling wires them into Claude Desktop and Claude Code.
+VibeCraft is a **user-gated, four-phase software studio** packaged simultaneously as a native Claude Code plugin (`.claude-plugin/`), a Claude Desktop Skill ZIP and Project bundle (`dist/vibecraft-desktop/`), and a zero-dependency Node.js static analyzer (`scripts/audit/`).
 
-## Component map
+## 1. Design Principles
 
-```mermaid
-flowchart TD
-  U([User]) --> S[system_prompt.md<br/>studio directive]
-  S --> R1[Scout]
-  S --> R2[Artisan]
-  S --> R3[Architect]
-  S --> R4[Builder]
-  S --> R5[Auditor]
-  R1 --> T1[stack_matrix_artifact.html]
-  R2 --> T2[brand_studio_artifact.html]
-  R3 --> T4[launchpad_artifact.html]
-  R4 --> T4
-  R5 --> T3[qa_diff_artifact.html]
-  T1 -- "VIBECRAFT PICK" --> U
-  T2 -- "VIBECRAFT LOCK" --> U
-  MCP[(MCP servers<br/>filesystem, search, fetch)] --> R1
-  MCP --> R4
-```
+1. **Explicit human gates over runaway generation ([ADR 0001](decisions/0001-gated-pipeline.md)):** Every phase boundary (`Scout -> Artisan -> Architect -> Builder`) pauses for a 1-keystroke confirmation or structured lock block (`VIBECRAFT PICK v2` / `VIBECRAFT LOCK v2`). Only Builder -> QA Auditor executes within the same turn so generated code is never delivered unaudited.
+2. **Progressive context disclosure:** Always-on skill frontmatter descriptions consume `~734` tokens (`claude plugin details`), loading detailed rubrics (`references/craft-12.md`, `code-quality.md`, `gotcha-library.md`, `examples.md`) and specialist role skills only when invoked.
+3. **Self-contained offline HTML artifacts ([ADR 0004](decisions/0004-inlined-css-over-tailwind-cdn.md)):** All four Generative UI templates (`templates/generative-ui/*.html`) compile from `scripts/build-templates.mjs` with inlined logical CSS, system font stacks, allowlisted geometric SVG sanitization, and offline `<pre>` diagram fallbacks.
+4. **Measured verification over LLM self-praise:** `scripts/audit/cli.js` (`vibecraft-audit`) checks 19 deterministic rules (`VC000`..`VC018`), and `qa_diff_artifact.html` reports `[Syntax: Not Run]` whenever shell compilation is unavailable.
 
-## Session sequence
+## 2. Pipeline State Machine
 
 ```mermaid
-sequenceDiagram
-  participant U as User
-  participant C as Claude (studio directive)
-  participant A as Artifact (HTML)
-  U->>C: one-line idea
-  C->>C: classify brief or detailed
-  alt brief
-    C-->>U: HUD + 2 micro-prompts
-    U->>C: "1 2"
-  end
-  C->>C: Scout research (silent)
-  C->>A: fill STACKS, publish Stack Matrix
-  U->>A: choose stack, Select Stack and Proceed
-  U->>C: paste VIBECRAFT PICK
-  C->>A: publish Brand Studio
-  U->>A: choose archetype, Lock in
-  U->>C: paste VIBECRAFT LOCK
-  C->>A: publish Launchpad (draft: diagrams + contracts)
-  C-->>U: HUD + [1] [2] [3]
-  U->>C: "1"
-  C->>C: Builder writes code, Auditor audits and fixes
-  C->>A: publish QA Diff, then full Launchpad
-  C-->>U: HUD + audit stamp
+flowchart LR
+  U["User Prompt"] --> G0{"Complete spec?"}
+  G0 -->|"Ambiguous"| P0["Phase 0: Intake Gate (<= 2 Qs)"]
+  P0 -->|"Digit / go"| P1["Phase 1: Research Scout"]
+  G0 -->|"Complete"| P1
+  P1 -->|"VIBECRAFT PICK v2 or digit"| P2["Phase 2: Brand Artisan"]
+  P2 -->|"VIBECRAFT LOCK v2 or ANSI skip"| P3["Phase 3: System Architect"]
+  P3 -->|"2 or 3 (Revise)"| P3
+  P3 -->|"1 (Approve & build)"| P4["Phase 4: Builder + QA Auditor"]
+  P4 --> OUT["Audited Source + 04-qa-diff.html + 04-launchpad.html"]
 ```
 
-## State without a server
+## 3. Repository Layout
 
-Claude Desktop has no shared state between artifacts and chat, so state travels as text the user pastes back. Each artifact produces one block; the directive treats a pasted block as authoritative.
+```text
+vibecraft/
+├── .claude-plugin/               # Native Claude Code plugin & marketplace manifests + icon.png
+├── .mcp.json                     # Version-pinned project MCP servers (${BRAVE_API_KEY} env ref)
+├── claude_desktop_config.json    # Version-pinned Claude Desktop MCP template
+├── commands/                     # /vibecraft:{build,stack,brand,audit,launchpad,doctor}
+├── skills/
+│   ├── vibecraft/                # Orchestrator SKILL.md + references/{craft-12,code-quality,gotcha-library,examples}.md
+│   ├── research-scout/           # Phase 1 specialist skill (6 archetypes, epistemic tagging)
+│   ├── brand-artisan/            # Phase 2 specialist skill (19-key :root contract, WCAG 2.2 AA)
+│   ├── system-architect/         # Phase 3 specialist skill (file boundaries, Mermaid, strict contracts)
+│   ├── fullstack-builder/        # Phase 4 specialist skill (token-clean implementation + Launchpad)
+│   └── qa-auditor/               # Phase 4 specialist skill (compiler + 19-rule audit + deslop loop)
+├── templates/generative-ui/      # Built offline HTML artifacts (stack_matrix, brand_studio, qa_diff, launchpad)
+├── scripts/
+│   ├── audit/                    # Zero-dependency Audit Engine v2 (cli, engine, rules, contrast, fixer, sarif)
+│   ├── lib/                      # Shared installer-core.mjs + versioned lock-blocks.js parser
+│   ├── build-templates.mjs       # Deterministic HTML template builder & drift checker
+│   ├── build-dist.mjs            # Deterministic Desktop bundle, PKZIP writer & system_prompt.md sync
+│   ├── doctor.mjs                # Environment & configuration diagnostic CLI
+│   └── verify-templates-browser.mjs # Headless Chromium + axe-core WCAG 2.2 AA + XSS + fuzz suite
+├── dist/vibecraft-desktop/       # Synchronized Desktop Skill ZIP, Project Knowledge & SHA256SUMS.txt
+├── evals/                        # 17 structural invariants + 14 calibrated golden/adversarial scenarios
+└── tests/                        # Unit, 38 rule fixtures, lock-block, installer E2E & link tests
+```
 
-| Block | Produced by | Carries |
-|---|---|---|
-| `VIBECRAFT PICK` | Stack Matrix | Chosen stack, why, performance, offline, cost, gotcha and fix |
-| `VIBECRAFT LOCK` | Brand Studio | Archetype name and the complete `:root` token block |
+## 4. Handoff Contracts & Token Math
 
-The user can also change a decision in plain chat. Chat wins over the artifact.
+- **`VIBECRAFT PICK v2` (`scripts/lib/lock-blocks.js`):** Captures `ArchetypeId`, `Stack`, `Why`, `Performance`, `Offline`, `Cost` with `[Verified]` / `[Inferred]` tags, and numbered `[Gotcha N]` + `Fix:` pairs that Phase 3 and Phase 4 must mitigate in code.
+- **`VIBECRAFT LOCK v2` (`scripts/lib/lock-blocks.js`):** Captures `Archetype`, `ThemeId`, `Scheme`, optional contrast `Waivers`, and all 19 canonical `:root` custom properties (`--bg-primary` through `--shape-opacity`).
+- **Token Adherence Score (`qa_diff_artifact.html`):** Excludes token-definition files (`tokens.css` or `note: "definitions"`) from the denominator so defining 19 variables never inflates component token compliance (`PRM-11`).
 
-## Templates
+## 5. Audit Engine v2 (`VC000`..`VC018`)
 
-Each template is one self-contained HTML file: Tailwind (CDN) for layout utilities, hand-written CSS driven by custom properties for components, and vanilla JavaScript. Each has exactly one data block that Claude replaces:
-
-| Template | Data block | Interaction |
-|---|---|---|
-| `stack_matrix_artifact.html` | `CONCEPT`, `STACKS` | Radio cards, copy selection or gotcha only |
-| `brand_studio_artifact.html` | `THEMES` (between `@tokens` markers) | Archetype radios rewrite `:root`; lock copies tokens |
-| `qa_diff_artifact.html` | `REPORT` | Category filter on the diff; copy stamp or report |
-| `launchpad_artifact.html` | `LAUNCH` | Tabs, Mermaid render, per-block and Copy All |
-
-Common behavior: tokens only for color; hover, focus-visible, active and disabled states; `prefers-reduced-motion` honored; clipboard via `navigator.clipboard` with an `execCommand` fallback and, if both fail, the text is selected and shown for manual copying.
-
-The Launchpad skips empty fields and empty tabs, so the Architect can publish a draft containing only diagrams and contracts.
-
-## The audit rules
-
-`tests/audit_rules_test.js` exports `audit(source, filename)`; the Auditor role describes the same rules.
-
-| Rule | Detects | Applies to |
-|---|---|---|
-| `hardcoded-color` | `#[0-9a-fA-F]{3,8}\b`, `rgb(a)(`, `hsl(a)(`, `oklch(` outside token definitions | css, html, js, ts |
-| `placeholder` | `TODO`/`FIXME`/`XXX`/`HACK` comments, stub phrases, lorem ipsum, stock names | all code |
-| `type-laundering` | `as any`, `as unknown as`, `: any`, `<any>` | ts |
-| `comment-slop` | Comments that narrate (`// increment ...`) | js, ts |
-| `transition-all` | `transition: all` and Tailwind `transition-all` | css, html |
-| `gradient` | `*-gradient(` and `bg-gradient-to-*` | css, html |
-| `z-index-arms-race` | `z-index` of four digits or more | css, html |
-| `missing-return-type` | Exported functions without a return type (single-line signatures) | ts |
-
-Token definitions are exempt in two ways: a line that declares a custom property (`--name: value`), and everything between `@tokens:start` and `@tokens:end` markers.
-
-## Decisions
-
-- **Gating beats parallel artifacts.** The brief describes both artifacts appearing at once and a rule that research and questions come before artifacts. The directive follows the gated rule: questions first for brief ideas, then Stack Matrix, then Brand Studio. The first reply still arrives immediately.
-- **Craft rules beat archetype wording.** "Laser glow" for Linear Dark is implemented as flat indigo and cyan accents with hairline borders. R1 and R2 forbid glow and gradients.
-- **Hex lives only in tokens.** Archetype palettes necessarily contain hex values, so they sit in clearly marked token blocks that the audit exempts. Everything else must use `var(--token)`.
-- **Skill path.** Claude Code discovers skills through a `SKILL.md`. The installer builds it from `system_prompt.md` and places the role files, templates and audit script beside it, so the relative paths in the directive keep working.
-- **MCP packages were verified at build time.** The old npm Brave Search server is deprecated and `server-fetch` is not an npm package, so the config uses `@brave/brave-search-mcp-server` and `uvx mcp-server-fetch`.
+`scripts/audit/engine.js` runs single-file (`auditFileSource`) and cross-module (`auditPaths` for `VC015 dead-export`) checks across `.css`, `.html`, `.js/.mjs/.cjs/.jsx`, `.ts/.tsx`, `.sh`, and `.json`. `scripts/audit/contrast.js` parses hex and `rgba()` custom properties, composites alpha surfaces over `--bg-primary`, and verifies WCAG 2.2 AA contrast (`>= 4.5:1`) for body text, muted copy, accent CTAs, and tinted status chips.

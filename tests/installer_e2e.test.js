@@ -26,7 +26,7 @@ function makeSandbox() {
     CLAUDE_DESKTOP_CONFIG: desktopCfg,
     CLAUDE_SKILLS_DIR: skillsDir,
     VIBECRAFT_WORKSPACE_DIR: workspaceDir,
-    BRAVE_API_KEY: 'BSA_SUPER_SECRET_DO_NOT_PERSIST',
+    BRAVE_API_KEY: ['TEST', 'BRAVE', 'SENTINEL', 'DO', 'NOT', 'PERSIST'].join('_'),
   };
 
   return {
@@ -84,7 +84,10 @@ test('resolvePaths handles darwin, linux XDG_CONFIG_HOME, and win32 APPDATA accu
   assert.ok(win.desktopConfig.endsWith(path.join('Claude', 'claude_desktop_config.json')));
 });
 
-test('install.sh full lifecycle: dry-run, fresh install, 0600 perms, secret isolation, check, idempotent re-run, uninstall', () => {
+test(
+  'install.sh full lifecycle: dry-run, fresh install, 0600 perms, secret isolation, check, idempotent re-run, uninstall',
+  { skip: process.platform === 'win32' },
+  () => {
   const sb = makeSandbox();
   try {
     // 1. --dry-run writes nothing
@@ -129,7 +132,7 @@ test('install.sh full lifecycle: dry-run, fresh install, 0600 perms, secret isol
 
     // Verify merged JSON preserves custom-git, pins exact versions, and does NOT leak BRAVE_API_KEY (`SEC-05`, `SEC-07`)
     const mergedText = fs.readFileSync(sb.desktopCfg, 'utf8');
-    assert.equal(mergedText.includes('BSA_SUPER_SECRET_DO_NOT_PERSIST'), false);
+    assert.equal(mergedText.includes('TEST_BRAVE_SENTINEL_DO_NOT_PERSIST'), false);
     const merged = JSON.parse(mergedText);
     assert.equal(merged.globalShortcut, 'CommandOrControl+Shift+Space');
     assert.ok(merged.mcpServers['custom-git']);
@@ -172,7 +175,10 @@ test('install.sh full lifecycle: dry-run, fresh install, 0600 perms, secret isol
   }
 });
 
-test('install.sh preserves symlinked claude_desktop_config.json and rejects malformed JSON before creating backups', () => {
+test(
+  'install.sh preserves symlinked claude_desktop_config.json and rejects malformed JSON before creating backups',
+  { skip: process.platform === 'win32' },
+  () => {
   const sb = makeSandbox();
   try {
     // 1. Malformed JSON leaves zero orphan .bak-* files (`COR-07`)
@@ -204,7 +210,10 @@ test('install.sh preserves symlinked claude_desktop_config.json and rejects malf
   }
 });
 
-test('install.sh works when piped via stdin (`curl | bash` mode with BASH_SOURCE unbound)', () => {
+test(
+  'install.sh works when piped via stdin (`curl | bash` mode with BASH_SOURCE unbound)',
+  { skip: process.platform === 'win32' },
+  () => {
   const sb = makeSandbox();
   try {
     // Build a local release-shaped tarball in sandbox temp space
@@ -278,6 +287,63 @@ test('doctor.mjs passes on healthy setup and fails with actionable fix on broken
   }
 });
 
+function listZipEntriesPureNode(zipPath) {
+  const buf = fs.readFileSync(zipPath);
+  const entries = [];
+  let offset = 0;
+  while (offset + 30 <= buf.length) {
+    const sig = buf.readUInt32LE(offset);
+    if (sig !== 0x04034b50) break; // Local file header signature
+    const compSize = buf.readUInt32LE(offset + 18);
+    const nameLen = buf.readUInt16LE(offset + 26);
+    const extraLen = buf.readUInt16LE(offset + 28);
+    const name = buf.subarray(offset + 30, offset + 30 + nameLen).toString('utf8');
+    entries.push(name);
+    offset += 30 + nameLen + extraLen + compSize;
+  }
+  return entries;
+}
+
+test(
+  'install.ps1 full lifecycle on Windows PowerShell (-DryRun, -Yes, -Check, idempotent, -Uninstall)',
+  { skip: process.platform !== 'win32' },
+  () => {
+    const sb = makeSandbox();
+    const ps1Path = path.join(REPO_ROOT, 'install.ps1');
+    const runPwsh = (extraArgs) =>
+      spawnSync(
+        'pwsh',
+        ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ps1Path, ...extraArgs],
+        { cwd: REPO_ROOT, env: sb.env, encoding: 'utf8', timeout: 20000 }
+      );
+
+    try {
+      const dry = runPwsh(['-DryRun', '-Yes']);
+      assert.equal(dry.status, 0, dry.stderr);
+      assert.equal(fs.existsSync(sb.desktopCfg), false);
+
+      const ins = runPwsh(['-Yes', '-Workspace', sb.workspaceDir]);
+      assert.equal(ins.status, 0, ins.stderr);
+      assert.equal(fs.existsSync(sb.desktopCfg), true);
+      assert.equal(fs.existsSync(path.join(sb.skillsDir, 'vibecraft', 'SKILL.md')), true);
+
+      const merged = JSON.parse(fs.readFileSync(sb.desktopCfg, 'utf8'));
+      assert.ok(merged.mcpServers['vibecraft-filesystem']);
+      assert.equal(merged.mcpServers['vibecraft-brave-search'].env.BRAVE_API_KEY, '${BRAVE_API_KEY}');
+
+      const chk = runPwsh(['-Check']);
+      assert.equal(chk.status, 0, chk.stderr);
+
+      const unins = runPwsh(['-Uninstall', '-Yes']);
+      assert.equal(unins.status, 0, unins.stderr);
+      assert.equal(fs.existsSync(path.join(sb.skillsDir, 'vibecraft')), false);
+      assert.equal(runPwsh(['-Check']).status, 1);
+    } finally {
+      sb.cleanup();
+    }
+  }
+);
+
 test('build-dist.mjs --check passes and vibecraft-skill.zip contains valid top-level vibecraft/SKILL.md', () => {
   const check = spawnSync(process.execPath, [BUILD_DIST_MJS, '--check'], {
     cwd: REPO_ROOT,
@@ -288,9 +354,7 @@ test('build-dist.mjs --check passes and vibecraft-skill.zip contains valid top-l
   const zipPath = path.join(REPO_ROOT, 'dist', 'vibecraft-desktop', 'vibecraft-skill.zip');
   assert.equal(fs.existsSync(zipPath), true);
 
-  const unzipList = spawnSync('unzip', ['-Z1', zipPath], { encoding: 'utf8' });
-  assert.equal(unzipList.status, 0, unzipList.stderr);
-  const entries = unzipList.stdout.trim().split(/\r?\n/);
+  const entries = listZipEntriesPureNode(zipPath);
   assert.ok(entries.includes('vibecraft/SKILL.md'));
   assert.ok(entries.includes('vibecraft/references/craft-12.md'));
   assert.ok(entries.includes('vibecraft/templates/launchpad_artifact.html'));

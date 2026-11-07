@@ -1,0 +1,39 @@
+name: Skill Quality Regression
+description: Report phase-skipping, verbose replies, weak gotchas, or contrast/slop regressions in Claude's output.
+title: "[Skill Quality]: "
+labels: ["skill-quality"]
+body:
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Pipeline Phase / Specialist Skill
+      options:
+        - Phase 0 · Intake Gate (vibecraft)
+        - Phase 1 · Research Scout (research-scout)
+        - Phase 2 · Brand Artisan (brand-artisan)
+        - Phase 3 · System Architect (system-architect)
+        - Phase 4 · Full-Stack Builder (fullstack-builder)
+        - Phase 4 · QA Auditor (qa-auditor)
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Claude Surface & Model
+      placeholder: "Claude Code v2.1.x · claude-sonnet-4-5"
+    validations:
+      required: true
+  - type: textarea
+    id: prompt
+    attributes:
+      label: User Prompt (Redacted)
+      description: Paste the exact user prompt or lock block that triggered the regression.
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed vs Expected Behavior
+      description: What did Claude emit, and which skill rule did it violate?
+    validations:
+      required: true

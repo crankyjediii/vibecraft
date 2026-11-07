@@ -41,7 +41,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 function Show-VibeCraftUsage {
-  Write-Host @"
+  [Console]::WriteLine(@"
 Usage: .\install.ps1 [options]
 
 Options:
@@ -53,7 +53,7 @@ Options:
   -NoCli             Skip standalone `$HOME\.claude\skills\vibecraft installation
   -Workspace <dir>   Workspace directory exposed to vibecraft-filesystem MCP
   -Help              Show this help text
-"@
+"@)
 }
 
 if ($Help) {
@@ -62,7 +62,7 @@ if ($Help) {
 }
 
 if ($NoDesktop -and $NoCli) {
-  Write-Host "Nothing selected (-NoDesktop and -NoCli both passed)."
+  [Console]::WriteLine("Nothing selected (-NoDesktop and -NoCli both passed).")
   exit 0
 }
 
@@ -96,7 +96,7 @@ try {
     $tempFetchDir = Join-Path ([System.IO.Path]::GetTempPath()) ("vibecraft-install-" + [System.Guid]::NewGuid().ToString('N'))
     [void](New-Item -ItemType Directory -Path $tempFetchDir -Force)
     $zipFile = Join-Path $tempFetchDir 'vibecraft.zip'
-    Write-Host "Downloading VibeCraft bundle from $zipUrl ..."
+    [Console]::WriteLine("Downloading VibeCraft bundle from $zipUrl ...")
     Invoke-WebRequest -Uri $zipUrl -OutFile $zipFile -UseBasicParsing
     Expand-Archive -LiteralPath $zipFile -DestinationPath $tempFetchDir -Force
 
@@ -114,7 +114,7 @@ try {
     $actionLabel = if ($Uninstall) { 'uninstall VibeCraft' } else { 'install VibeCraft' }
     $answer = Read-Host -Prompt "Proceed to $actionLabel? [Y/n]"
     if ($answer -and ($answer -notmatch '^(y|yes)$')) {
-      Write-Host 'Aborted.'
+      [Console]::WriteLine('Aborted.')
       exit 0
     }
   }
@@ -152,11 +152,11 @@ try {
   if ((-not $Check) -and (-not $Uninstall) -and (-not $DryRun)) {
     $uvxCmd = Get-Command -Name 'uvx' -ErrorAction SilentlyContinue
     if ($null -eq $uvxCmd) {
-      Write-Host "Note: optional 'uvx' CLI not found on PATH (needed only for vibecraft-fetch MCP server)."
-      Write-Host "      Install uv later if desired: powershell -ExecutionPolicy ByPass -c `"irm https://astral.sh/uv/install.ps1 | iex`""
+      [Console]::WriteLine("Note: optional 'uvx' CLI not found on PATH (needed only for vibecraft-fetch MCP server).")
+      [Console]::WriteLine("      Install uv later if desired: powershell -ExecutionPolicy ByPass -c `"irm https://astral.sh/uv/install.ps1 | iex`"")
     }
-    Write-Host "Note: set BRAVE_API_KEY in your user environment variables if you use vibecraft-brave-search."
-    Write-Host "Done. Run 'node scripts/doctor.mjs' (or '/vibecraft:doctor' in Claude Code) to verify."
+    [Console]::WriteLine("Note: set BRAVE_API_KEY in your user environment variables if you use vibecraft-brave-search.")
+    [Console]::WriteLine("Done. Run 'node scripts/doctor.mjs' (or '/vibecraft:doctor' in Claude Code) to verify.")
   }
 } finally {
   if ($tempFetchDir -and (Test-Path -LiteralPath $tempFetchDir)) {

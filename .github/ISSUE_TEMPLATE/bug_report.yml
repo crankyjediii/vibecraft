@@ -1,0 +1,45 @@
+name: Bug Report
+description: Report an installer defect, broken HTML artifact, Audit Engine false positive, or CLI crash.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug. Run `node scripts/doctor.mjs` first if this involves installation or MCP setup.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected Surface
+      options:
+        - Claude Code Plugin (CLI)
+        - Claude Desktop (Skill ZIP / Project)
+        - Audit Engine v2 (vibecraft-audit)
+        - Generative UI HTML Artifact
+        - Installer (install.sh / install.ps1)
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: OS, Shell & Node Version
+      placeholder: "macOS 15.1 (arm64), zsh, Node v22.14.0"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Exact Reproduction Steps
+      placeholder: |
+        1. Run `...`
+        2. Open `...`
+        3. Observe `...`
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Verbatim Error Output / `doctor.mjs` Report
+      render: text
+    validations:
+      required: false

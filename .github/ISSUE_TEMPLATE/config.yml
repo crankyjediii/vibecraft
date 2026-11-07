@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private Security Vulnerability Report
+    url: https://github.com/crankyjediii/vibecraft/security/advisories/new
+    about: Report XSS, installer privilege issues, or supply-chain vulnerabilities privately.
+  - name: Documentation & Troubleshooting Guide
+    url: https://github.com/crankyjediii/vibecraft/blob/main/docs/index.md
+    about: Browse setup guides, rule references, and self-diagnostic instructions.

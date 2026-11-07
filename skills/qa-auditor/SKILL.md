@@ -1,13 +1,13 @@
 ---
 name: qa-auditor
-description: Phase 4 QA Auditor for VibeCraft. Runs real compiler checks and the 18-rule Audit Engine v2 (scripts/audit/cli.js), repairs safe violations in up to 3 passes, emits qa_diff_artifact.html, gates launchpad_artifact.html, and prints an honest measured QA stamp. Activate on Phase 4 or /vibecraft:audit.
+description: Phase 4 QA Auditor for VibeCraft. Runs real compiler checks and the 19-rule Audit Engine v2 (scripts/audit/cli.js), repairs safe violations in up to 3 passes, emits qa_diff_artifact.html, gates launchpad_artifact.html, and prints an honest measured QA stamp. Activate on Phase 4 or /vibecraft:audit.
 ---
 
 # Phase 4B: QA Auditor
 
 ## Purpose
 
-Verify generated or existing repository code with real compiler checks and the 18-rule VibeCraft Audit Engine v2 (`scripts/audit/cli.js`), repair mechanical defects without altering behavior, record every before/after hunk in `qa_diff_artifact.html`, gate final Launchpad publication on clean checks, and close the turn with a strictly measured QA stamp.
+Verify generated or existing repository code with real compiler checks and the 19-rule VibeCraft Audit Engine v2 (`scripts/audit/cli.js`), repair mechanical defects without altering behavior, record every before/after hunk in `qa_diff_artifact.html`, gate final Launchpad publication on clean checks, and close the turn with a strictly measured QA stamp.
 
 ## Inputs
 
@@ -23,7 +23,7 @@ Verify generated or existing repository code with real compiler checks and the 1
 ## Step Procedure
 
 1. **Run syntax and type checker (`Check 1`):** Execute `npx tsc --noEmit` (or `node --check`, `cargo check`, `ruff check`) when shell execution is available. Record the exact command in `REPORT.syntax.checker` and exact error count in `REPORT.syntax.errors`. If shell execution is unavailable, set `REPORT.syntax.checker = 'not run'` and `REPORT.syntax.errors = 0`.
-2. **Run 18-rule Audit Engine v2 (`Check 2`):** Execute `node "${CLAUDE_PLUGIN_ROOT}/scripts/audit/cli.js" <target-dir> --json` (or relative to `${CLAUDE_SKILL_DIR}`) covering `VC001..VC018` and `VC000` (`hardcoded-color`, `token-contrast`, `missing-focus-visible`, `outline-none-without-replacement`, `touch-target-size`, `transition-all`, `gradient`, `glow-shadow`, `z-index-arms-race`, `unlabeled-control`, `type-laundering`, `missing-return-type`, `swallowed-error`, `console-leftover`, `dead-export`, `placeholder`, `comment-slop`, `hardcoded-secret`).
+2. **Run 19-rule Audit Engine v2 (`Check 2`):** Execute `node "${CLAUDE_PLUGIN_ROOT}/scripts/audit/cli.js" <target-dir> --json` (or relative to `${CLAUDE_SKILL_DIR}`) covering `VC000..VC018` (`invalid-ignore`, `hardcoded-color`, `token-contrast`, `missing-focus-visible`, `outline-none-without-replacement`, `touch-target-size`, `transition-all`, `gradient`, `glow-shadow`, `z-index-arms-race`, `unlabeled-control`, `type-laundering`, `missing-return-type`, `swallowed-error`, `console-leftover`, `dead-export`, `placeholder`, `comment-slop`, `hardcoded-secret`).
 3. **Verify Phase 1 gotcha mitigations & prose (`Check 3 & Check 4`):** Confirm each locked `[Gotcha]` from Phase 1 has a concrete implementation in code, and scrub user-facing strings and chat prose for filler openers, vague intensifiers, and em dashes.
 4. **Repair loop (up to `3` passes):** Fix safe, behavior-preserving findings (`tokens`, `comments`, `defensive`, `types`, `helpers`, `placeholder`, `style`, `prose`), recording each repair hunk in `REPORT.diffs` and re-running Steps 1 and 2 after every pass. Leave behavior-changing fixes untouched and increment `REPORT.openSlop` or `REPORT.openGotchas`.
 5. **Emit `qa_diff_artifact.html` and gate `launchpad_artifact.html`:**

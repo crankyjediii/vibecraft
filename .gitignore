@@ -1,0 +1,15 @@
+# Dependencies & caches
+node_modules/
+coverage/
+.npm/
+
+# Local session & scratch artifacts
+.claude/
+prompts/
+*.bak-*
+*.log
+/tmp*
+
+# OS metadata
+.DS_Store
+Thumbs.db
